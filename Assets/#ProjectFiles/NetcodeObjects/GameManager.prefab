@@ -1,0 +1,141 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8128404105633890266
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8568209962030680791}
+  - component: {fileID: 217293003861445448}
+  - component: {fileID: 7591054439643195877}
+  - component: {fileID: -6645841148584323926}
+  - component: {fileID: 3347900912071771609}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8568209962030680791
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8128404105633890266}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &217293003861445448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8128404105633890266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2862966186
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &7591054439643195877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8128404105633890266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e80f6ab28c1849b4696d28d79e44aa47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxKills: 10
+  gameTimeLimit: 300
+  teamSize: 3
+  characterSetUpLength: 3
+  teamOne: []
+  teamTwo: []
+  playerTeam: 0
+  playerPoints: 0
+  MovePoints:
+  - {x: -4, y: -22}
+  - {x: 34, y: 23}
+  playersForTeamOne: 0
+  playersForTeamTwo: 0
+  totalTeamOneKills: 0
+  totalTeamTwoKills: 0
+  timer: 0
+  gameStarted: 0
+  isGameOver: 0
+  isInFinalEliminationMode: 0
+  forcedMobile: 0
+  NetCodeActive: 0
+--- !u!114 &-6645841148584323926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8128404105633890266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fb07f6f52c616b46b00bc27b1193bdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnInterval: 5
+--- !u!114 &3347900912071771609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8128404105633890266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecc56daf0403fb4cad05eb1e739ef46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkSpawnObjects:
+  - gObject: {fileID: 8310334442787878340, guid: db22e6f383a55e146947022a6855fdc3, type: 3}
+    poolSize: 10
+  - gObject: {fileID: 8310334442787878340, guid: 4780ef5ab93542744bc1302742052ac0, type: 3}
+    poolSize: 10
+  - gObject: {fileID: 8310334442787878340, guid: 201b2a8dfb9311047a53835f65f8c8af, type: 3}
+    poolSize: 10
+  - gObject: {fileID: 8310334442787878340, guid: d6ec49afc86f2db48bcfb942a4eee6f0, type: 3}
+    poolSize: 10
+  - gObject: {fileID: 3060291319055678945, guid: ceecba8c991d7924db68e8605489db22, type: 3}
+    poolSize: 30
+  - gObject: {fileID: 3060291319055678945, guid: d079d54eefe8d954e8426fba9fb030ef, type: 3}
+    poolSize: 30
+  - gObject: {fileID: 3060291319055678945, guid: 0d255c22ffd487a44aab9a2678cee2a6, type: 3}
+    poolSize: 30
+  - gObject: {fileID: 1556169196827650, guid: d64c1ed87a35d6145bba1734ca14d612, type: 3}
+    poolSize: 30
+  - gObject: {fileID: 1262955698068164, guid: 1e67824e5c2cae544bea5505bf741d43, type: 3}
+    poolSize: 30
+  - gObject: {fileID: 108436661378258716, guid: daaec95ad674bbb4d82f0448d0d279f2, type: 3}
+    poolSize: 30
+  - gObject: {fileID: 1282364566017586, guid: 1f4f7ad877d21e141bba81a7092bdaaf, type: 3}
+    poolSize: 30
+  - gObject: {fileID: 1448707677214384, guid: 36cc3beef2e148f4aa1b17145bbc804d, type: 3}
+    poolSize: 30
