@@ -96,18 +96,21 @@ When human players are not available, **AI bots** step in to fill roles:
 
 All systems are designed for **modular extensibility**:
 
-### Core Classes and Interfaces:
+### Core Classes:
 - `CharacterMovement` — Manages character movement
 - `CharacterShooter` — Handles shooting and aiming
 - `HealthSystem` — Manages health and damage
 - `PlayerInputHandler` — Manages player input (movement, shooting, etc.)
 - `AimingController` — Handles aiming and hit detection
-- `PlayerCharacterController` — Orchestrates character actions
-- `AICharacterController` — AI behavior tree interface
 - `PlayerDetails` — Stores and updates character attributes
-- `IDamageable` — Interface for taking damage
+
+### Interfaces
 - `ICombat` — Handles shooting logic
 - `IStates` — Interface for state management (e.g., idle, moving, shooting)
+
+### Character Controllers
+- `PlayerCharacterController` — Manages player character movement, aiming and shooting
+- `AICharacterController` — Manages AI character behavior
 
 ### Netcode Logic:
 - `LobbyManager` — Manages lobby state and player connections
@@ -125,8 +128,9 @@ Handles all round logic:
 - `SaveManager` — Manages player data (e.g., character stats, details)
 
 ### Other Managers and Systems:
-- `AudioManager` — Manages audio effects and music
-- `MenuManager` — Handles menu logic and UI
+- `CharacterSelection` — Handles character selection and customization
+- `AudioManager` — Manages Audio effects and music
+- `MenuManager` — Handles Menu logic and UI management
 - `NetworkAPIManager` — Handles network requests and responses
 
 ---
