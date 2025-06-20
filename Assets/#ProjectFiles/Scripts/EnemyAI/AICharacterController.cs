@@ -133,10 +133,9 @@ public class AICharacterController : NetworkBehaviour, ICombat
 
     private void Update()
     {
-        if (currentState != States.Base
-            || GameManager.Instance.isGameOver)
-
+        if (GameManager.Instance.isGameOver)
         {
+            characterMovement.SetCanRotate(false);
             characterMovement.SetMovementInput(Vector3.zero);
             return;
         }
@@ -227,13 +226,13 @@ public class AICharacterController : NetworkBehaviour, ICombat
         if (targetTransform == null) GetClosestOpponent();
         else
         {
-            movementInput = Vector3.zero;
+            SetState(States.Shoot);
+            Vector3 shootDirection = (targetTransform.position - transform.position).normalized;
+            shootDirection.y = 0;
             transform.LookAt(targetTransform);
+            characterMovement.SetCanRotate(false);
+            characterMovement.SetAimInput(new Vector2(shootDirection.x, shootDirection.z));
             characterShooter.TryShoot();
-
-            targetTransform = null;
-            opponentInShootRange = false;
-            GetEvasion(Random.Range(0, 1f), 1f);
         }
     }
 
@@ -347,7 +346,8 @@ public class AICharacterController : NetworkBehaviour, ICombat
 
     private IEnumerator SwitchStateDelay(States state, float waitTime)
     {
-        yield return new WaitForSeconds(waitTime);
+        yield return new WaitForSeconds(waitTime + 0.5f);
+        characterMovement.SetCanRotate(true);
         animator.SetLayerWeight(1, 0);
         SetState(state);
     }

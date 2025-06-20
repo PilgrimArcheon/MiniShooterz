@@ -146,8 +146,7 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
 
         playerInputHandler.enabled = true;
 
-        if (currentState != States.Base
-            || GameManager.Instance.isGameOver)
+        if (GameManager.Instance.isGameOver)
         {
             movementInput = Vector3.zero;
             characterMovement.SetMovementInput(movementInput);
@@ -180,8 +179,11 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
         if (!CheckCurrentState(statesToCheck) && characterShooter.CanShoot)
         {
             SetState(States.Shoot);
-            characterMovement.SetMovementInput(Vector2.zero);
+            Vector3 shootDirection = (aimDir - transform.position).normalized;
+            shootDirection.y = 0;
             transform.LookAt(aimDir);
+            characterMovement.SetCanRotate(false);
+            characterMovement.SetAimInput(new Vector2(shootDirection.x, shootDirection.z));
             characterShooter.TryShoot();
         }
     }
@@ -237,7 +239,8 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
 
     private IEnumerator SwitchStateDelay(States state, float waitTime)
     {
-        yield return new WaitForSeconds(waitTime);
+        yield return new WaitForSeconds(waitTime + 0.5f);
+        characterMovement.SetCanRotate(true);
         animator.SetLayerWeight(1, 0);
         SetState(state);
     }
