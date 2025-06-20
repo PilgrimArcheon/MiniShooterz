@@ -40,7 +40,16 @@ public class LoadUp : MonoBehaviour
 
         if (a >= 0.95f && !startScene) // When the colour gets to the value 0.1...
         {
-            StartCoroutine(LoadAsynchrously(sceneToLoad));
+            if (!IsNetworkCode) StartCoroutine(LoadAsynchrously(sceneToLoad));
+            else
+            {
+                PlayerManager[] playerManagers = FindObjectsOfType<PlayerManager>();
+
+                foreach (var player in playerManagers)
+                {
+                    player.LoadGameScene(sceneToLoad);
+                }
+            }
             startScene = true;
         }
     }

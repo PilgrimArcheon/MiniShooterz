@@ -8,6 +8,7 @@ public class ItemSpawner : NetworkBehaviour
     [SerializeField] private float spawnInterval = 5f;// time between each spawn
     private List<ItemBox> itemBoxes = new(); // List of item boxes spawned
     private List<Transform> spawnPoints; // List of spawn points
+    private ItemData[] ItemsToSpawn; // List of spawn items
     private List<Transform> spawnedTransList = new(); // List of spawned points with items
     void Awake() => Instance = this; // Set instance to this script
 
@@ -19,6 +20,7 @@ public class ItemSpawner : NetworkBehaviour
             InvokeRepeating(nameof(SpawnItems), 1f, spawnInterval);
 
             spawnedTransList = new(); // Clear list on spawn
+            ItemsToSpawn = SetUpManager.Instance.itemsToSpawn;
             spawnPoints = SetUpManager.Instance.spawnPoints;// Get the spawn points from the setup manager
         }
     }
@@ -30,7 +32,7 @@ public class ItemSpawner : NetworkBehaviour
 
         // spawn a random item from the array of items to spawn
         float totalChance = 0f;
-        foreach (var item in SetUpManager.Instance.itemsToSpawn)
+        foreach (var item in ItemsToSpawn)
         {
             totalChance += item.spawnChance;
         }
@@ -38,7 +40,7 @@ public class ItemSpawner : NetworkBehaviour
         float randomValue = Random.Range(0f, totalChance);
         float cumulative = 0f;
 
-        foreach (var item in SetUpManager.Instance.itemsToSpawn)
+        foreach (var item in ItemsToSpawn)
         {
             cumulative += item.spawnChance;
             if (randomValue <= cumulative)
@@ -59,12 +61,12 @@ public class ItemSpawner : NetworkBehaviour
 
         if (IsServer) // Only spawn on the server
         {
-            NetworkObject spawnedItem = NetworkObjectPool.Instance.GetObject(item.itemPrefab.gameObject, spawnPoints[index].position, spawnPoints[index].rotation);
+            NetworkObject spawnedItem = NetworkObjectPool.Instance.GetNetworkObject(item.itemPrefab.gameObject, spawnPoints[index].position, spawnPoints[index].rotation);
             spawnedItem.Spawn();
 
             itemBoxes.Add(spawnedItem.GetComponent<ItemBox>());
             spawnedTransList.Add(spawnPoints[index]);
-            SetUpManager.Instance.spawnPoints.Remove(spawnPoints[index]);
+            spawnPoints.Remove(spawnPoints[index]);
         }
     }
 
@@ -74,21 +76,19 @@ public class ItemSpawner : NetworkBehaviour
         if (spawnedTransList.Count > index)
         {
             itemBoxToDestroy = itemBox;
-            SetUpManager.Instance.spawnPoints.Add(spawnedTransList[index]);
-            RemoveItemBoxServerRpc();
+            spawnPoints.Add(spawnedTransList[index]);
+            RemoveItemBox();
             spawnedTransList.Remove(spawnedTransList[index]);
         }
 
         itemBoxes.Remove(itemBox);
     }
     ItemBox itemBoxToDestroy;
-    [ServerRpc]
-    public void RemoveItemBoxServerRpc()
+    public void RemoveItemBox()
     {
         if (itemBoxToDestroy == null) return;
-        itemBoxToDestroy.gameObject.SetActive(false);
         NetworkObject networkObject = itemBoxToDestroy.GetComponent<NetworkObject>();
-        networkObject.Despawn(false);
+        NetworkObjectPool.Instance.ReturnNetworkObject(networkObject);
     }
 }
 

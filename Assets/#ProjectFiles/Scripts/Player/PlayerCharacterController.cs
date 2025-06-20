@@ -162,7 +162,7 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
     // Handle player movement using WASD 
     private void HandleMovementInput()
     {
-        Vector2 moveVector =  playerInputHandler.MovementInput;
+        Vector2 moveVector = playerInputHandler.MovementInput;
         movementInput = new Vector2(moveVector.x, moveVector.y);
         characterMovement.SetMovementInput(movementInput);
     }
@@ -186,10 +186,12 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
         }
     }
 
-    public void PerformShoot()
+    #region Implemented Interface
+    public void PerformShoot(float shootTime)
     {
-        animator.Play("Shoot", 0, 0.25f);
-        StartCoroutine(SwitchStateDelay(States.Base, 0.5f));
+        animator.SetLayerWeight(1, 1);
+        animator.Play("Shoot", 1, 0f);
+        StartCoroutine(SwitchStateDelay(States.Base, shootTime));
     }
 
     public void SetState(States state)
@@ -236,9 +238,10 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
     private IEnumerator SwitchStateDelay(States state, float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
-
+        animator.SetLayerWeight(1, 0);
         SetState(state);
     }
+    #endregion
 }
 
 [System.Serializable]

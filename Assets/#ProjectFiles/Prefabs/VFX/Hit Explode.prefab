@@ -131,6 +131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifeTime: 1
+  prefab: {fileID: 1448707677214384}
 --- !u!1 &1824685852936174913
 GameObject:
   m_ObjectHideFlags: 0

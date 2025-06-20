@@ -41,6 +41,7 @@ public class NetworkObjectPool : NetworkBehaviour
                 GameObject obj = Instantiate(prefab);
                 NetworkObject netObj = obj.GetComponent<NetworkObject>();
                 netObj.gameObject.SetActive(false);
+                netObj.Spawn();
                 pooledObjects[prefabHash].Enqueue(netObj);
             }
 
@@ -48,7 +49,7 @@ public class NetworkObjectPool : NetworkBehaviour
         }
     }
 
-    public NetworkObject GetObject(GameObject prefab, Vector3 position, Quaternion rotation)
+    public NetworkObject GetNetworkObject(GameObject prefab, Vector3 position, Quaternion rotation)
     {
         uint prefabHash = prefab.GetComponent<NetworkObject>().PrefabIdHash;
 
@@ -66,7 +67,7 @@ public class NetworkObjectPool : NetworkBehaviour
         }
     }
 
-    public void ReturnObject(NetworkObject obj)
+    public void ReturnNetworkObject(NetworkObject obj)
     {
         obj.gameObject.SetActive(false);
         uint prefabHash = obj.PrefabIdHash;

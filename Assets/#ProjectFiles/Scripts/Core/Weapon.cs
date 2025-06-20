@@ -11,4 +11,5 @@ public class Weapon : MonoBehaviour
     public float reloadTime = 1f;
     public int fireRate = 3;
     public float coolDown = 1f;
+    public float bulletDamage = 10f;
 }

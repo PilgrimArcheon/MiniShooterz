@@ -52,7 +52,7 @@ public class AimingController : NetworkBehaviour
 
         aimIndicator.SetActive(isAiming);
 
-        if (!joyStick)
+        if (!joyStick && !playerInputHandler.IsMobile)
         {
             Vector3 mouseScreenPos = Input.mousePosition;
             Ray ray = mainCamera.ScreenPointToRay(mouseScreenPos);
@@ -70,7 +70,8 @@ public class AimingController : NetworkBehaviour
             float vertical = playerInputHandler.AimDirectionInput.y;
             Vector3 inputDir = new(horizontal, 0f, vertical);
             inputDir.Normalize();
-            aimFollow.position = transform.position + (inputDir * characterShooter.maxDistance);
+            if (inputDir.magnitude > 0.1f)
+                aimFollow.position = aimPivot.position + (inputDir * characterShooter.maxDistance);
         }
 
         if (isAiming)

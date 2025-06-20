@@ -2515,6 +2515,7 @@ MonoBehaviour:
   reloadTime: 2.5
   fireRate: 1
   coolDown: 1
+  bulletDamage: 10
 --- !u!1 &1705971241404125542
 GameObject:
   m_ObjectHideFlags: 0
@@ -6624,7 +6625,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1367349285
+  GlobalObjectIdHash: 2940122591
   InScenePlacedSourceGlobalObjectIdHash: 1367349285
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -8242,6 +8243,7 @@ MonoBehaviour:
   reloadTime: 1.5
   fireRate: 1
   coolDown: 0.25
+  bulletDamage: 10
 --- !u!1 &5310230339164074066
 GameObject:
   m_ObjectHideFlags: 0
@@ -12866,6 +12868,7 @@ MonoBehaviour:
   reloadTime: 3
   fireRate: 5
   coolDown: 1.5
+  bulletDamage: 10
 --- !u!1 &7114265827225557562
 GameObject:
   m_ObjectHideFlags: 0

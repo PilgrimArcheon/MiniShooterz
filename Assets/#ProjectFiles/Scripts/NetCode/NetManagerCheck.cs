@@ -10,7 +10,10 @@ public class NetManagerCheck : MonoBehaviour
 
     private void OnSceneChanged(Scene prevScene, Scene newScene)
     {
-        if (newScene.name.Contains("Menu")) Destroy(gameObject);
-        Debug.Log("SceneChange: " + newScene.name);
+        if (gameObject != null)
+        {
+            if (newScene.name.Contains("Menu")) Destroy(gameObject);
+            Debug.Log("SceneChange: " + newScene.name);
+        }
     }
 }

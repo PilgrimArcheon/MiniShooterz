@@ -29,7 +29,8 @@ public class DestroyOnLifeTime : NetworkBehaviour
         {
             // Time to return to the pool from whence it came.
             var networkObject = gameObject.GetComponent<NetworkObject>();
-            networkObject.Despawn();
+            //networkObject.gameObject.SetActive(false);
+            NetworkObjectPool.Instance.ReturnNetworkObject(networkObject);
             return;
         }
     }

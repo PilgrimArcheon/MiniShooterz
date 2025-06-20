@@ -4949,7 +4949,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1272254339
+  GlobalObjectIdHash: 809121716
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -5022,6 +5022,7 @@ MonoBehaviour:
   playerId: 0
   damage: 10
   lifeTime: 0.1
+  prefab: {fileID: 3060291319055678945}
   flashHitEffectPrefab: {fileID: 1556169196827650, guid: d64c1ed87a35d6145bba1734ca14d612, type: 3}
   bulletHitEffect: {fileID: 1448707677214384, guid: 36cc3beef2e148f4aa1b17145bbc804d, type: 3}
 --- !u!114 &-6107624512148533669

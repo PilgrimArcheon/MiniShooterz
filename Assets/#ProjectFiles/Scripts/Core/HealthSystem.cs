@@ -87,7 +87,7 @@ public class HealthSystem : NetworkBehaviour
         OnStateChange.Invoke(false);
 
         //GameObject deathEffect = Instantiate(deathPrefab, transform.position, transform.rotation);
-        NetworkObject deathEffect = NetworkObjectPool.Instance.GetObject(deathPrefab, transform.position, transform.rotation);
+        NetworkObject deathEffect = NetworkObjectPool.Instance.GetNetworkObject(deathPrefab, transform.position, transform.rotation);
         deathEffect.Spawn();
 
         ShowCharRpc(false);
@@ -102,7 +102,7 @@ public class HealthSystem : NetworkBehaviour
     private void SpawnHealthBuffServerRpc()
     {
         //GameObject healthBuffEffect = Instantiate(healthBuffPrefab, transform.position, transform.rotation);
-        NetworkObject healthBuffEffect = NetworkObjectPool.Instance.GetObject(healthBuffPrefab, transform.position, transform.rotation);
+        NetworkObject healthBuffEffect = NetworkObjectPool.Instance.GetNetworkObject(healthBuffPrefab, transform.position, transform.rotation);
         healthBuffEffect.Spawn();
 
         AudioManager.Instance.PlaySfx(SoundEffect.Health, transform.position);

@@ -295,10 +295,11 @@ public class AICharacterController : NetworkBehaviour, ICombat
 
 
     #region Implemented Interface
-    public void PerformShoot()
+    public void PerformShoot(float shootTime)
     {
-        animator.Play("Shoot", 0, 0.25f);
-        StartCoroutine(SwitchStateDelay(States.Base, 0.5f));
+        animator.SetLayerWeight(1, 1);
+        animator.Play("Shoot", 1, 0f);
+        StartCoroutine(SwitchStateDelay(States.Base, shootTime));
     }
 
     public void SetState(States state)
@@ -347,7 +348,7 @@ public class AICharacterController : NetworkBehaviour, ICombat
     private IEnumerator SwitchStateDelay(States state, float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
-
+        animator.SetLayerWeight(1, 0);
         SetState(state);
     }
     #endregion

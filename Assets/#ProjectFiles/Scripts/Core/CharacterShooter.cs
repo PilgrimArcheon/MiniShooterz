@@ -20,6 +20,7 @@ public class CharacterShooter : NetworkBehaviour
     float lastShotTime;
     public bool isAI;
     public Action OnSwitchWeapons;
+    public Action<float, float> OnLoadBullets;
 
     int characterTeam;  // Reference to the team (Red or Blue)
     int characterId;
@@ -79,12 +80,12 @@ public class CharacterShooter : NetworkBehaviour
     // Shoot a bullet in the given direction
     private IEnumerator Shoot()
     {
-        gameObject.GetComponent<ICombat>().PerformShoot();
+        gameObject.GetComponent<ICombat>().PerformShoot(fireRate * 0.1f);
 
         for (int i = 0; i < fireRate; i++)
         {
             if (IsOwner || !NetcodeManager.Instance) SpawnBulletServerRpc();
-            yield return new WaitForSeconds(0.15f);
+            yield return new WaitForSeconds(0.1f);
         }
 
         ammoCount--;
@@ -105,6 +106,7 @@ public class CharacterShooter : NetworkBehaviour
             return;
 
         reloadTimer += Time.deltaTime;
+        OnLoadBullets.Invoke(reloadTimer, weapons[currentWeaponId].reloadTime);
 
         if (reloadTimer >= weapons[currentWeaponId].reloadTime)
         {
@@ -130,12 +132,13 @@ public class CharacterShooter : NetworkBehaviour
     }
 
     public bool CanShoot { get { return ammoCount > 0 && Time.time - lastShotTime >= shootCooldown; } }
+    public Weapon GetCurWeapon { get { return weapons[currentWeaponId]; } }
 
     [ServerRpc]
     private void SpawnBulletServerRpc() // Spawn Bullet Only on server
     {
-        NetworkObject bullet = NetworkObjectPool.Instance.GetObject(bulletPrefab, firePoint.position, firePoint.rotation);
-        
+        NetworkObject bullet = NetworkObjectPool.Instance.GetNetworkObject(bulletPrefab, firePoint.position, firePoint.rotation);
+
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.SetBullet(characterTeam, characterId, weapons[currentWeaponId]);  // Assign weaponId and team to the bullet
 

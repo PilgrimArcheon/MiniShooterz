@@ -13,17 +13,20 @@ public class PlayerManager : NetworkBehaviour
     private int deaths;
     private int xpAmount;
 
-    void Awake() => DontDestroyOnLoad(gameObject);
+    void Awake() { DontDestroyOnLoad(gameObject); }
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
-        playerId = SaveManager.Instance.state.userName;
+        if (IsOwner)
+        {
+            playerId = SaveManager.Instance.state.userName;
+            charId = SaveManager.Instance.state.charId;
+            GetOwnerPlayerDetailsRpc(playerId, charId);
+        }
 
-        if (IsOwner) GetOwnerCharRpc(SaveManager.Instance.state.charId);
-
-        if (IsHost)
+        if (IsServer)
         {
             NetcodeManager.Instance.HostPlayer = this;
             GetHostRpc(OwnerClientId);
@@ -119,6 +122,11 @@ public class PlayerManager : NetworkBehaviour
         if (IsHost) LoadScreenRpc(sceneToLoad);
     }
 
+    public void LoadGameScene(string sceneToLoad)
+    {
+        if (IsOwner) NetworkManager.SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Single);
+    }
+
     [Rpc(SendTo.Everyone)] // Get the player's team info
     public void PlayerTeamRpc(int _team, int _teamId, ulong _ownerId)
     {
@@ -156,9 +164,13 @@ public class PlayerManager : NetworkBehaviour
         deaths = _deaths;
         xpAmount = _xpAmount;
     }
-    
+
     [Rpc(SendTo.Everyone)]
-    public void GetOwnerCharRpc(int _charId) => charId = _charId;
+    public void GetOwnerPlayerDetailsRpc(string _playerId, int _charId)
+    {
+        playerId = _playerId;
+        charId = _charId;
+    }
 
     public int GetTeam { get { return team; } }
     public int GetTeamID { get { return teamId; } }

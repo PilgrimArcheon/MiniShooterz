@@ -24,7 +24,7 @@ public class Bullet : NetworkBehaviour
             started = true;
             lifeTime = Time.fixedTime + (ownerWeapon.bulletMaxDistance / ownerWeapon.bulletSpeed);
 
-            NetworkObject flashHitEfx = NetworkObjectPool.Instance.GetObject(flashHitEffectPrefab, transform.position, transform.rotation);
+            NetworkObject flashHitEfx = NetworkObjectPool.Instance.GetNetworkObject(flashHitEffectPrefab, transform.position, transform.rotation);
             flashHitEfx.Spawn();
         }
 
@@ -56,8 +56,7 @@ public class Bullet : NetworkBehaviour
         if (lifeTime < Time.time)
         {
             // Time to return to the pool from whence it came.
-            var networkObject = gameObject.GetComponent<NetworkObject>();
-            networkObject.Despawn();
+            Despawn();
             return;
         }
     }
@@ -74,7 +73,7 @@ public class Bullet : NetworkBehaviour
 
                 if (IsServer && IsSpawned)
                 {
-                    NetworkObject bulletHitEfx = NetworkObjectPool.Instance.GetObject(bulletHitEffect, transform.position, transform.rotation);
+                    NetworkObject bulletHitEfx = NetworkObjectPool.Instance.GetNetworkObject(bulletHitEffect, transform.position, transform.rotation);
                     bulletHitEfx.Spawn();
 
                     rigidbody.velocity = Vector3.zero;
@@ -84,5 +83,12 @@ public class Bullet : NetworkBehaviour
                 AudioManager.Instance.PlaySfx(SoundEffect.BulletDrop, transform.position);
             }
         }
+    }
+
+    private void Despawn()
+    {
+        var networkObject = gameObject.GetComponent<NetworkObject>();
+        //networkObject.gameObject.SetActive(false);
+        NetworkObjectPool.Instance.ReturnNetworkObject(networkObject);
     }
 }

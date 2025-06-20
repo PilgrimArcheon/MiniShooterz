@@ -12,11 +12,11 @@ public class PooledPrefabInstanceHandler : INetworkPrefabInstanceHandler
 
     public NetworkObject Instantiate(ulong ownerClientId, Vector3 position, Quaternion rotation)
     {
-        return NetworkObjectPool.Instance.GetObject(prefab, position, rotation);
+        return NetworkObjectPool.Instance.GetNetworkObject(prefab, position, rotation);
     }
 
     public void Destroy(NetworkObject networkObject)
     {
-        NetworkObjectPool.Instance.ReturnObject(networkObject);
+        NetworkObjectPool.Instance.ReturnNetworkObject(networkObject);
     }
 }

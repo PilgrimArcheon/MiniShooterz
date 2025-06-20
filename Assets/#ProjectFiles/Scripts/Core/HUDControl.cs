@@ -11,7 +11,7 @@ public class HUDControl : NetworkBehaviour
     private bool hasSetUp;
     private GameObject hudUI;
     private GameObject bulletCountHolder;
-    private List<GameObject> bulletCountUi = new();
+    private List<Image> bulletCountUi = new();
     private Slider healthSlider;
     private TMP_Text userName;
     public bool isAI;
@@ -26,6 +26,7 @@ public class HUDControl : NetworkBehaviour
         characterShooter = GetComponent<CharacterShooter>();
 
         healthSystem.OnStateChange += OnStateChange; // Set up State Change Event
+        characterShooter.OnLoadBullets += OnLoadBullets;// Set up Load Bullets Event
         characterShooter.OnSwitchWeapons += OnSwitchWeapons; // Set up Weapon Switch Event
     }
 
@@ -62,7 +63,7 @@ public class HUDControl : NetworkBehaviour
         bulletCountHolder = hudTransform.GetChild(2).gameObject;
         OnSwitchWeapons();
 
-        foreach (Transform child in bulletCountHolder.transform) { bulletCountUi.Add(child.gameObject); }
+        foreach (Transform child in bulletCountHolder.transform) { bulletCountUi.Add(child.GetChild(0).GetComponent<Image>()); }
 
         userName.text = userId;
         hasSetUp = true;
@@ -80,7 +81,7 @@ public class HUDControl : NetworkBehaviour
     {
         if (hudUI == null) return;
 
-        hudUI.transform.position = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * 4f);
+        hudUI.transform.position = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * 5f);
         hudUI.SetActive(healthSystem.currentHealth > 0);
     }
 
@@ -99,18 +100,41 @@ public class HUDControl : NetworkBehaviour
         userName.gameObject.SetActive(characterTeam == GameManager.Instance.GetMyTeam);
     }
 
+    float bulletFillAmount = 1f;
+    private void OnLoadBullets(float currentValue, float loadValue)
+    {
+        if (bulletCountHolder == null) return;
+
+        // Current bullet's reload progress (0 to 1)
+        bulletFillAmount = Mathf.Clamp01(currentValue / loadValue);
+    }
+
     private void UpdateShooterBulletCount()
     {
         if (bulletCountHolder == null) return;
 
         bulletCountHolder.SetActive(IsOwner && !isAI);
 
-        int bulletCount = characterShooter.ammoCount;
+        int currentAmmo = characterShooter.ammoCount;
+        int maxAmmo = characterShooter.GetCurWeapon.ammoCount;
 
-        for (int i = 0; i < bulletCountHolder.transform.childCount; i++)
+        for (int i = 0; i < bulletCountUi.Count; i++)
         {
-            if (i < bulletCount) bulletCountUi[i].SetActive(true);
-            else bulletCountUi[i].SetActive(false);
+            if (i < currentAmmo)
+            {
+                // Fully loaded bullets
+                bulletCountUi[i].fillAmount = 1f;
+            }
+            else if (i == currentAmmo && currentAmmo < maxAmmo)
+            {
+                // Currently reloading bullet (partial fill)
+                bulletCountUi[i].fillAmount = bulletFillAmount;
+            }
+            else
+            {
+                // Empty bullets
+                bulletCountUi[i].fillAmount = 0f;
+            }
         }
     }
 

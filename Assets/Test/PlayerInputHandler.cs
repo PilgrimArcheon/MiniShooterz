@@ -59,7 +59,7 @@ public class PlayerInputHandler : MonoBehaviour
 
         Vector3 tempInputDir = forward * input.y + right * input.x;
 
-        return new Vector2(Mathf.RoundToInt(tempInputDir.x), Mathf.RoundToInt(tempInputDir.z));
+        return new Vector2(tempInputDir.x, tempInputDir.z);
     }
 
     public void OnAimDirectionInput(InputAction.CallbackContext context)
