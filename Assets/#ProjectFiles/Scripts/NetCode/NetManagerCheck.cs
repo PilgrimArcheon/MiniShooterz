@@ -3,10 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class NetManagerCheck : MonoBehaviour
 {
-    void OnEnable()
-    {
-        SceneManager.activeSceneChanged += OnSceneChanged;
-    }
+    void OnEnable() => SceneManager.activeSceneChanged += OnSceneChanged;
 
     private void OnSceneChanged(Scene prevScene, Scene newScene)
     {
@@ -16,4 +13,7 @@ public class NetManagerCheck : MonoBehaviour
             Debug.Log("SceneChange: " + newScene.name);
         }
     }
+
+    void OnDisable() => SceneManager.activeSceneChanged -= OnSceneChanged;
+    void OnDestroy() => SceneManager.activeSceneChanged -= OnSceneChanged;
 }

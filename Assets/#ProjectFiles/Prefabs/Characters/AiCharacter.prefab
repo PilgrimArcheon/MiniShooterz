@@ -1222,6 +1222,7 @@ MonoBehaviour:
   reloadTime: 1.5
   fireRate: 1
   coolDown: 0.25
+  bulletDamage: 10
 --- !u!1 &1180026689584538812
 GameObject:
   m_ObjectHideFlags: 0
@@ -6032,6 +6033,7 @@ MonoBehaviour:
   reloadTime: 2.5
   fireRate: 1
   coolDown: 1
+  bulletDamage: 10
 --- !u!1 &4127652809815385428
 GameObject:
   m_ObjectHideFlags: 0
@@ -9659,6 +9661,7 @@ MonoBehaviour:
   reloadTime: 3
   fireRate: 5
   coolDown: 1.5
+  bulletDamage: 10
 --- !u!1 &6248400128724975685
 GameObject:
   m_ObjectHideFlags: 0
@@ -13690,9 +13693,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4030314579339234236}
+  - component: {fileID: 1986438695485098024}
+  - component: {fileID: 6806658130686265066}
   - component: {fileID: 4387492641332871302}
   - component: {fileID: 7880809489612590311}
-  - component: {fileID: 5810490966437912649}
   - component: {fileID: 4270298314480927566}
   - component: {fileID: 822248265971866593}
   - component: {fileID: 5337143692936397130}
@@ -13723,6 +13727,54 @@ Transform:
   - {fileID: 4677516091629308526}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!195 &1986438695485098024
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8405135139318743821}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0.5
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!143 &6806658130686265066
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8405135139318743821}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2.5
+  m_Radius: 1
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &4387492641332871302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13735,7 +13787,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1891061094
+  GlobalObjectIdHash: 1947060284
   InScenePlacedSourceGlobalObjectIdHash: 1891061094
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -13775,29 +13827,6 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!136 &5810490966437912649
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8405135139318743821}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 1
-  m_Height: 2.5
-  m_Direction: 1
-  m_Center: {x: 0, y: 1.25, z: 0}
 --- !u!114 &4270298314480927566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13851,6 +13880,9 @@ MonoBehaviour:
   moveSpeed: 5
   rotationSpeed: 700
   movementInput: {x: 0, y: 0}
+  aimInput: {x: 0, y: 0}
+  IsAI: 1
+  CanRotate: 1
 --- !u!114 &5337143692936397130
 MonoBehaviour:
   m_ObjectHideFlags: 0

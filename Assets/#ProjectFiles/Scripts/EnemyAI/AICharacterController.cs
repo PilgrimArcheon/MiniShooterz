@@ -1,5 +1,4 @@
 using System.Collections;
-using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -36,6 +35,7 @@ public class AICharacterController : NetworkBehaviour, ICombat
     bool movePointSet;
 
     Vector2 movementInput;
+    Vector3 movePosition;
 
     public int charId;
     public int aiTeam;  // AI team
@@ -137,19 +137,15 @@ public class AICharacterController : NetworkBehaviour, ICombat
         {
             characterMovement.SetCanRotate(false);
             characterMovement.SetMovementInput(Vector3.zero);
+            characterMovement.SetMoveDestination(transform.position);
             return;
         }
-
-        if (transform.position.x < movePoints[0].x
-            || transform.position.x > movePoints[1].x) GetRandomMovePosition();
-        else if (transform.position.z < movePoints[0].y
-            || transform.position.z > movePoints[1].y) GetRandomMovePosition();
 
         CheckForOpponent();
 
         HandleAIBehavior();
         HandleAnimations();
-        HandleObstacleEncounter();
+        //HandleObstacleEncounter();
     }
 
     private void CheckForOpponent()
@@ -170,6 +166,7 @@ public class AICharacterController : NetworkBehaviour, ICombat
         else Evade();
 
         characterMovement.SetMovementInput(movementInput);
+        characterMovement.SetMoveDestination(movePosition);
     }
 
     private void HandleAnimations()
@@ -184,6 +181,8 @@ public class AICharacterController : NetworkBehaviour, ICombat
         if (!movePointSet) GetRandomMovePosition();
         else
         {
+            movePosition = patrolPosition;
+            characterMovement.SetStopDistance(1f);
             if (Vector2.Distance(transform.position, patrolPosition) > 1f)
             {
                 Vector3 moveDirection = (patrolPosition - transform.position).normalized;
@@ -195,7 +194,7 @@ public class AICharacterController : NetworkBehaviour, ICombat
 
     private void HandleObstacleEncounter()
     {
-        Vector3 startCast = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
+        Vector3 startCast = new(transform.position.x, transform.position.y + 1f, transform.position.z);
         Vector3 endCast = startCast + (transform.forward * 1.5f);
 
         if (Physics.CheckSphere(endCast, 0.75f, whatIsGround))
@@ -212,6 +211,9 @@ public class AICharacterController : NetworkBehaviour, ICombat
         if (targetTransform == null) GetClosestOpponent();
         else
         {
+            movePosition = targetTransform.position;
+            characterMovement.SetStopDistance(shootRadius);
+
             if (Vector2.Distance(transform.position, targetTransform.position) > shootRadius)
             {
                 Vector3 moveDirection = (targetTransform.position - transform.position).normalized;
@@ -229,15 +231,19 @@ public class AICharacterController : NetworkBehaviour, ICombat
             SetState(States.Shoot);
             Vector3 shootDirection = (targetTransform.position - transform.position).normalized;
             shootDirection.y = 0;
-            transform.LookAt(targetTransform);
+            movePosition = targetTransform.position;
             characterMovement.SetCanRotate(false);
             characterMovement.SetAimInput(new Vector2(shootDirection.x, shootDirection.z));
             characterShooter.TryShoot();
+            targetTransform = null;
         }
     }
 
     private void Evade()
     {
+        movePosition = evadePosition;
+        characterMovement.SetStopDistance(0.5f);
+
         if (Vector3.Distance(transform.position, evadePosition) > 0.5f)
         {
             Vector3 moveDirection = (evadePosition - transform.position).normalized;
@@ -258,7 +264,8 @@ public class AICharacterController : NetworkBehaviour, ICombat
 
         patrolPosition = new Vector3(rndX, startPos.y, rndZ);
 
-        movePointSet = true;
+        if (Physics.Raycast(patrolPosition, -Vector3.up, 1f, whatIsGround))
+            movePointSet = true;
     }
 
     //Handle Getting Closest Opponent Position
@@ -346,6 +353,8 @@ public class AICharacterController : NetworkBehaviour, ICombat
 
     private IEnumerator SwitchStateDelay(States state, float waitTime)
     {
+        if (currentState == States.Shoot) GetEvasion(0, Random.Range(5f, 7f));
+
         yield return new WaitForSeconds(waitTime + 0.5f);
         characterMovement.SetCanRotate(true);
         animator.SetLayerWeight(1, 0);

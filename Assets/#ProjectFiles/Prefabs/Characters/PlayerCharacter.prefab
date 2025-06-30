@@ -6575,9 +6575,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3481972315241731236}
+  - component: {fileID: 6775540373018658932}
   - component: {fileID: -933270203623741024}
   - component: {fileID: 1415486204351200406}
-  - component: {fileID: 1958363630632641527}
   - component: {fileID: 7062501502176642921}
   - component: {fileID: 5287690178205721067}
   - component: {fileID: 8770391578756238582}
@@ -6613,6 +6613,32 @@ Transform:
   - {fileID: 2873226070377837509}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!143 &6775540373018658932
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4499701044609239917}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2.5
+  m_Radius: 1
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &-933270203623741024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6625,7 +6651,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2940122591
+  GlobalObjectIdHash: 1367349285
   InScenePlacedSourceGlobalObjectIdHash: 1367349285
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -6665,29 +6691,6 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!136 &1958363630632641527
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4499701044609239917}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 1
-  m_Height: 2.5
-  m_Direction: 1
-  m_Center: {x: 0, y: 1.25, z: 0}
 --- !u!114 &7062501502176642921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6757,6 +6760,8 @@ MonoBehaviour:
   moveSpeed: 5
   rotationSpeed: 700
   movementInput: {x: 0, y: 0}
+  aimInput: {x: 0, y: 0}
+  CanRotate: 1
 --- !u!114 &1941902210721272957
 MonoBehaviour:
   m_ObjectHideFlags: 0
