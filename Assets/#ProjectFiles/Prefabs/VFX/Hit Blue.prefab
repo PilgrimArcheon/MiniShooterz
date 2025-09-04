@@ -9847,7 +9847,7 @@ GameObject:
   - component: {fileID: 4375260158437666}
   - component: {fileID: 198534132775548940}
   - component: {fileID: 199851861497556180}
-  - component: {fileID: -1662688737000839343}
+  - component: {fileID: 5179140772113472420}
   m_Layer: 0
   m_Name: Hit Blue
   m_TagString: Untagged
@@ -14758,7 +14758,7 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &-1662688737000839343
+--- !u!114 &5179140772113472420
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14767,18 +14767,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1795992203533318}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Script: {fileID: 11500000, guid: d098ba5c411862a44b49089b8f50ba06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2940122591
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  lifeTime: 1
 --- !u!1 &1798305462694108
 GameObject:
   m_ObjectHideFlags: 0

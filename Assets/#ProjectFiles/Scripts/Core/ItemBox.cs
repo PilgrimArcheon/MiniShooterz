@@ -1,8 +1,7 @@
 using System;
-using Unity.Netcode;
 using UnityEngine;
 
-public class ItemBox : NetworkBehaviour
+public class ItemBox : MonoBehaviour
 {
     public int itemId;
     public int itemValue;
@@ -44,15 +43,11 @@ public class ItemBox : NetworkBehaviour
             }
         }
 
-        if (pickUp)
-        {
-            ItemSpawner.Instance.RemoveItemBox(this);
-        }
+        if (pickUp) ItemSpawner.Instance.RemoveItemBox(this);
     }
 
     void SetInteractAIInput(GameObject interactGO)
     {
-        // This is called on the client when the player enters the trigger.
         float pickUpDecision = UnityEngine.Random.Range(0, 1f);
         if (pickUpDecision > 0.75f) GiveItemValue(interactGO);
     }

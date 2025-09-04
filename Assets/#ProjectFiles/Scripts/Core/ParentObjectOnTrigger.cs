@@ -1,23 +1,19 @@
-using Unity.Netcode;
 using UnityEngine;
 
-public class ParentObjectOnTrigger : NetworkBehaviour
+public class ParentObjectOnTrigger : MonoBehaviour
 {
     bool hasParent;
     bool started;
-    public override void OnNetworkSpawn()
+    public void OnEnable()
     {
-        if (IsServer) started = true;// Only the server can start the process
+        started = true;// Only the server can start the process
     }
 
-    public override void OnNetworkDespawn()
+    public void OnDisable()
     {
-        if (IsServer)
-        {
-            started = false;// Reset started flag
-            hasParent = false;// Reset parent flag
-            parentObject = null;// Reset parent object
-        }
+        started = false;// Reset started flag
+        hasParent = false;// Reset parent flag
+        parentObject = null;// Reset parent object
     }
 
     void Update()

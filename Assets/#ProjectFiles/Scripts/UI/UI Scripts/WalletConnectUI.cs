@@ -12,12 +12,4 @@ public class WalletConnectUI : MonoBehaviour
         connectButton.SetActive(walletNotConnected);
         walletConnectedGO.SetActive(!walletNotConnected);
     }
-
-    public void OpenConnectWalletModal()
-    {
-        SaveManager.Instance.state.walletAddress = "";
-        SaveManager.Instance.state.userName = "";
-        SaveManager.Instance.Save();
-        WalletConnect.Instance.ConnectWallet();//To be Updated
-    }
 }

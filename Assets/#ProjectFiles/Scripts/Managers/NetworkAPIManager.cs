@@ -59,20 +59,12 @@ public class NetworkAPIManager : MonoBehaviour
         serverUrl = "https://api.berarumble.com/";
     }
 
-    void Start() => WalletConnect.Instance.InitWalletConnect();
     public void ShowConnectOverlay()
     {
         OnTryConnectWalletReown.Invoke();
         info.text = "Connecting to Wallet...";
-        WalletConnect.Instance.OpenModal();
     }
     public void UpdateInfoText(string text) => info.text = text;
-
-    public void WalletConnectSuccess()
-    {
-        info.text = $"Wallet Connected: {WalletConnect.Instance.walletAddress}";
-        OnWalletConnectSuccess.Invoke();
-    }
 
     public void ConnectWalletToNetwork()//ButtonClick Input
     {
@@ -86,7 +78,7 @@ public class NetworkAPIManager : MonoBehaviour
 
         // Connect wallet to network
         SaveManager.Instance.state.userName = usernameInput.text;
-        SaveManager.Instance.state.walletAddress = WalletConnect.Instance.walletAddress;
+        SaveManager.Instance.state.walletAddress = "";
         ConnectWallet();
     }
 

@@ -1,24 +1,15 @@
-using Unity.Netcode;
 using UnityEngine;
 
-public class DestroyOnLifeTime : NetworkBehaviour
+public class DestroyOnLifeTime : MonoBehaviour
 {
     [SerializeField] float lifeTime = 1f;
     float timeToStay;
 
     bool started;
-    public override void OnNetworkSpawn()
+    public void OnEnable()
     {
-        if (IsServer)
-        {
-            started = true;
-            timeToStay = Time.time + lifeTime;
-        }
-    }
-
-    public override void OnNetworkDespawn()
-    {
-        if (IsServer) started = false;// Reset started flag
+        started = true;
+        timeToStay = Time.time + lifeTime;
     }
 
     void Update()
@@ -28,9 +19,7 @@ public class DestroyOnLifeTime : NetworkBehaviour
         if (timeToStay < Time.time)
         {
             // Time to return to the pool from whence it came.
-            var networkObject = gameObject.GetComponent<NetworkObject>();
-            //networkObject.gameObject.SetActive(false);
-            NetworkObjectPool.Instance.ReturnNetworkObject(networkObject);
+            gameObject.SetActive(false);
             return;
         }
     }

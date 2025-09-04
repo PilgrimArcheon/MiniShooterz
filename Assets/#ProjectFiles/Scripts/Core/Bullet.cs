@@ -1,11 +1,7 @@
-using System;
-using System.Collections;
-using System.Threading.Tasks;
-using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Bullet : NetworkBehaviour
+public class Bullet : MonoBehaviour
 {
     public int team;  // Team tag for bullet (Red or Blue)
     public int playerId;
@@ -17,26 +13,13 @@ public class Bullet : NetworkBehaviour
     [SerializeField] GameObject bulletHitEffect;
 
     bool started;
-    public override void OnNetworkSpawn()
+    public void InitBullet()
     {
-        if (IsServer)
-        {
-            started = true;
-            lifeTime = Time.fixedTime + (ownerWeapon.bulletMaxDistance / ownerWeapon.bulletSpeed);
+        started = true;
+        lifeTime = Time.fixedTime + (ownerWeapon.bulletMaxDistance / ownerWeapon.bulletSpeed);
 
-            NetworkObject flashHitEfx = NetworkObjectPool.Instance.GetNetworkObject(flashHitEffectPrefab, transform.position, transform.rotation);
-            flashHitEfx.Spawn();
-        }
-
-        if (IsClient)
-        {
-            AudioManager.Instance.PlaySfx(SoundEffect.Shoot, transform.position);
-        }
-    }
-
-    public override void OnNetworkDespawn()
-    {
-        if (IsServer) started = false;// Reset started flag
+        Instantiate(flashHitEffectPrefab, transform.position, transform.rotation);
+        AudioManager.Instance.PlaySfx(SoundEffect.Shoot, transform.position);
     }
 
     public void SetBullet(int _team, int _playerId, Weapon weapon)
@@ -44,6 +27,8 @@ public class Bullet : NetworkBehaviour
         team = _team;
         playerId = _playerId;
         ownerWeapon = weapon;
+
+        InitBullet();
 
         rigidbody = GetComponent<Rigidbody>();
         rigidbody.velocity = rigidbody.transform.forward * weapon.bulletSpeed;
@@ -55,8 +40,7 @@ public class Bullet : NetworkBehaviour
 
         if (lifeTime < Time.time)
         {
-            // Time to return to the pool from whence it came.
-            Despawn();
+            Destroy(gameObject);
             return;
         }
     }
@@ -71,24 +55,13 @@ public class Bullet : NetworkBehaviour
             {
                 targetHealth.TakeDamage(damage, team, playerId);  // Damage if opposite team
 
-                if (IsServer && IsSpawned)
-                {
-                    NetworkObject bulletHitEfx = NetworkObjectPool.Instance.GetNetworkObject(bulletHitEffect, transform.position, transform.rotation);
-                    bulletHitEfx.Spawn();
+                Instantiate(bulletHitEffect, transform.position, transform.rotation);
 
-                    rigidbody.velocity = Vector3.zero;
-                    lifeTime = Time.time - 1f;
-                }
+                rigidbody.velocity = Vector3.zero;
+                lifeTime = Time.time - 1f;
 
                 AudioManager.Instance.PlaySfx(SoundEffect.BulletDrop, transform.position);
             }
         }
-    }
-
-    private void Despawn()
-    {
-        var networkObject = gameObject.GetComponent<NetworkObject>();
-        //networkObject.gameObject.SetActive(false);
-        NetworkObjectPool.Instance.ReturnNetworkObject(networkObject);
     }
 }

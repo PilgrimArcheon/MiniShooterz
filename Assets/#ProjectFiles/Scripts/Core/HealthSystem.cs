@@ -1,8 +1,7 @@
 using System;
-using Unity.Netcode;
 using UnityEngine;
 
-public class HealthSystem : NetworkBehaviour
+public class HealthSystem : MonoBehaviour
 {
     [Header("Health Settings")]
     public float maxHealth = 100f;
@@ -36,13 +35,11 @@ public class HealthSystem : NetworkBehaviour
     {
         currentHealth += incHealth; // Add health to current health
         if (currentHealth > maxHealth) currentHealth = maxHealth; // Clamp health to maxHealth
-        if (IsOwner || !NetcodeManager.Instance)
+        if (!GameManager.Instance.IsMultiplayer)
         {
-            UpdateHealthRpc(currentHealth);
-            SpawnHealthBuffServerRpc();
-        }// Update health on client
-
-        Debug.Log("Inc Health");
+            UpdateHealth(currentHealth);
+            SpawnHealthBuff();
+        }
     }
 
     // Take damage and handle death (with team check)
@@ -51,8 +48,7 @@ public class HealthSystem : NetworkBehaviour
         if (damageTeam != characterTeam)  // Only take damage from the opposite team
         {
             currentHealth -= amount;
-            // gameObject.GetComponent<ICombat>().TakeDamage();
-            if (IsOwner || !NetcodeManager.Instance) { UpdateHealthRpc(currentHealth); }// Update health on client
+            if (!GameManager.Instance.IsMultiplayer) { UpdateHealth(currentHealth); }// Update health on client
             if (currentHealth <= 0) Die(damageTeam, playerId);
         }
     }
@@ -60,66 +56,50 @@ public class HealthSystem : NetworkBehaviour
     // Handle the character's death
     private void Die(int damageTeam, int playerId)
     {
-        if (IsOwner || !NetcodeManager.Instance) DoDeathServerRpc(); // Spawn death on server
+        DoDeathServer(); 
 
         GameManager.Instance.RegisterKill(damageTeam, playerId); // Register kill for team
         GameManager.Instance.RegisterDeath(characterTeam, id); // Register kill for team
         GameManager.Instance.RegisterXP(damageTeam, playerId, UnityEngine.Random.Range(120, 200));//XP per pickUp
         GameManager.Instance.Respawn(transform, characterTeam); // Respawn character
 
-        if (IsOwner || !NetcodeManager.Instance) Invoke(nameof(Respawn), respawnTime);  // Respawn after delay
+        Invoke(nameof(Respawn), respawnTime);
     }
 
     // Respawn character at the spawn point
-    private void Respawn() => DoRespawnServerRpc();
+    private void Respawn()
+    {
+        currentHealth = maxHealth;
+        OnStateChange.Invoke(true);
 
-    [Rpc(SendTo.Everyone)]
-    void UpdateHealthRpc(float health) => currentHealth = health;
+        ShowChar(true);
 
-    [Rpc(SendTo.Everyone)]
-    void ShowCharRpc(bool show) => gameObject.SetActive(show);
+        gameObject.SetActive(true);  // Reactivate character
+        transform.parent = null;
+    }
 
-    [ServerRpc]
-    private void DoDeathServerRpc()
+
+    void UpdateHealth(float health) => currentHealth = health;
+
+    void ShowChar(bool show) => gameObject.SetActive(show);
+
+    private void DoDeathServer()
     {
         gameObject.SetActive(false);  // Disable character
 
         OnStateChange.Invoke(false);
 
-        //GameObject deathEffect = Instantiate(deathPrefab, transform.position, transform.rotation);
-        NetworkObject deathEffect = NetworkObjectPool.Instance.GetNetworkObject(deathPrefab, transform.position, transform.rotation);
-        deathEffect.Spawn();
+        Instantiate(deathPrefab, transform.position, transform.rotation);
 
-        ShowCharRpc(false);
+        ShowChar(false);
 
         AudioManager.Instance.PlaySfx(SoundEffect.Death, transform.position);
-
-        // if (NetcodeManager.Instance)
-        //     NetcodeManager.Instance.SpawnNetObject(deathEffect);
     }
 
-    [ServerRpc]
-    private void SpawnHealthBuffServerRpc()
+    private void SpawnHealthBuff()
     {
-        //GameObject healthBuffEffect = Instantiate(healthBuffPrefab, transform.position, transform.rotation);
-        NetworkObject healthBuffEffect = NetworkObjectPool.Instance.GetNetworkObject(healthBuffPrefab, transform.position, transform.rotation);
-        healthBuffEffect.Spawn();
+        Instantiate(healthBuffPrefab, transform.position, transform.rotation);
 
         AudioManager.Instance.PlaySfx(SoundEffect.Health, transform.position);
-
-        // if (NetcodeManager.Instance)
-        //     NetcodeManager.Instance.SpawnNetObject(healthBuffEffect);
-    }
-
-    [ServerRpc]
-    private void DoRespawnServerRpc()
-    {
-        currentHealth = maxHealth;
-        OnStateChange.Invoke(true);
-
-        if (IsOwner) ShowCharRpc(true);
-
-        gameObject.SetActive(true);  // Reactivate character
-        transform.parent = null;
     }
 }

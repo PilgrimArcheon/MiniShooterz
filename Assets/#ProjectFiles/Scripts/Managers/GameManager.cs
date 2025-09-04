@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
-using Unity.Netcode;
 
-public class GameManager : NetworkBehaviour
+public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     [Header("Game Settings")]
@@ -34,25 +33,19 @@ public class GameManager : NetworkBehaviour
 
     [Header("Other Settings")]
     public bool forcedMobile;
-    public bool NetCodeActive;
+    public bool IsMultiplayer;
 
     void Awake()
     {
         Instance = this;
 
-        NetCodeActive = NetcodeManager.Instance;
-
         timer = gameTimeLimit;
     }
 
-    private void Start()
+    void Start()
     {
-        if (!NetCodeActive) SpawnTeams();
-    }
-
-    public override void OnNetworkSpawn()
-    {
-        if (NetCodeActive) StartCoroutine(TrySpawnTeams()); // Spawn Net Object
+        CreateCharacterDetailsSlots();
+        if (!IsMultiplayer) SpawnTeams();
     }
 
     public Transform GetAvailableSpawnPoint(Transform[] spawnPoints)
@@ -65,25 +58,6 @@ public class GameManager : NetworkBehaviour
             }
         }
         return spawnPoints[0];
-    }
-
-    private IEnumerator TrySpawnTeams()
-    {
-        CreateCharacterDetailsSlots();
-
-        if (NetCodeActive)
-        {
-            int clientsLoaded = NetworkManager.Singleton.ConnectedClientsIds.Count;
-
-            int playersLoaded = 0;
-            while (playersLoaded != clientsLoaded)
-            {
-                playersLoaded = FindObjectsOfType<PlayerManager>().Length;
-            }
-
-            yield return new WaitForSeconds(1.5f);
-            SpawnTeams();
-        }
     }
 
     void CreateCharacterDetailsSlots()
@@ -100,28 +74,17 @@ public class GameManager : NetworkBehaviour
     {
         MenuManager.Instance.OpenMenu("mainGame");
 
-        if (NetCodeActive)
-        {
-            if (!IsHost) return;
-
-            AssignTeamId();
-        }
-
         // Spawn the Red Team
         for (int i = 0; i < teamSize; i++)
         {
             if (i <= (playersForTeamOne - 1))  // Spawn the player in the red team
             {
-                if (NetCodeActive) HandleNetCodePlayerSpawn(0, i);
-                else
-                {
-                    PlayerCharacterController player = Instantiate(SetUpManager.Instance.playerPrefab, GetAvailableSpawnPoint(SetUpManager.Instance.teamOneSpawnPoints).position, GetAvailableSpawnPoint(SetUpManager.Instance.teamOneSpawnPoints).rotation).GetComponent<PlayerCharacterController>();
-                    SetUpManager.Instance.occupier.transform.parent = GetAvailableSpawnPoint(SetUpManager.Instance.teamOneSpawnPoints);
-                    player.name += $" Team-1 {i + 1}";
-                    player.CharacterUserSetUp("Player_" + Random.Range(100, 999), SaveManager.Instance.state.charId, 0, i);
-                    playerTeam = 0;
-                    teamOne.Add(player.gameObject);
-                }
+                PlayerCharacterController player = Instantiate(SetUpManager.Instance.playerPrefab, GetAvailableSpawnPoint(SetUpManager.Instance.teamOneSpawnPoints).position, GetAvailableSpawnPoint(SetUpManager.Instance.teamOneSpawnPoints).rotation).GetComponent<PlayerCharacterController>();
+                SetUpManager.Instance.occupier.transform.parent = GetAvailableSpawnPoint(SetUpManager.Instance.teamOneSpawnPoints);
+                player.CharacterUserSetUp("Player_" + Random.Range(100, 999), SaveManager.Instance.state.charId, 0, i);
+                player.name += $" Team-1 {i + 1}";
+                playerTeam = 0;
+                teamOne.Add(player.gameObject);
             }
             else  // Spawn an AI for the rest of the red team
             {
@@ -129,7 +92,6 @@ public class GameManager : NetworkBehaviour
                 SetUpManager.Instance.occupier.transform.parent = GetAvailableSpawnPoint(SetUpManager.Instance.teamOneSpawnPoints);
                 ai.name += $" Team-1 {i + 1}";
                 ai.CharacterUserSetUp("Bot " + Random.Range(100, 999), Random.Range(0, characterSetUpLength), 0, i);
-                NetworkSpawn(ai.gameObject);
                 teamOne.Add(ai.gameObject);
             }
         }
@@ -139,16 +101,12 @@ public class GameManager : NetworkBehaviour
         {
             if (i <= (playersForTeamTwo - 1))  // Spawn the player in the blue team
             {
-                if (NetCodeActive) HandleNetCodePlayerSpawn(1, i);
-                else
-                {
-                    PlayerCharacterController player = Instantiate(SetUpManager.Instance.playerPrefab, GetAvailableSpawnPoint(SetUpManager.Instance.teamTwoSpawnPoints).position, GetAvailableSpawnPoint(SetUpManager.Instance.teamTwoSpawnPoints).rotation).GetComponent<PlayerCharacterController>();
-                    SetUpManager.Instance.occupier.transform.parent = GetAvailableSpawnPoint(SetUpManager.Instance.teamTwoSpawnPoints);
-                    player.name += $" Team-2 {i + 1}";
-                    player.CharacterUserSetUp("Player_" + Random.Range(100, 999), SaveManager.Instance.state.charId, 1, i);
-                    playerTeam = 1;
-                    teamTwo.Add(player.gameObject);
-                }
+                PlayerCharacterController player = Instantiate(SetUpManager.Instance.playerPrefab, GetAvailableSpawnPoint(SetUpManager.Instance.teamTwoSpawnPoints).position, GetAvailableSpawnPoint(SetUpManager.Instance.teamTwoSpawnPoints).rotation).GetComponent<PlayerCharacterController>();
+                SetUpManager.Instance.occupier.transform.parent = GetAvailableSpawnPoint(SetUpManager.Instance.teamTwoSpawnPoints);
+                player.CharacterUserSetUp("Player_" + Random.Range(100, 999), SaveManager.Instance.state.charId, 1, i);
+                player.name += $" Team-2 {i + 1}";
+                playerTeam = 1;
+                teamTwo.Add(player.gameObject);
             }
             else  // Spawn an AI for the rest of the blue team
             {
@@ -156,44 +114,11 @@ public class GameManager : NetworkBehaviour
                 SetUpManager.Instance.occupier.transform.parent = GetAvailableSpawnPoint(SetUpManager.Instance.teamTwoSpawnPoints);
                 ai.name += $" Team-2 {i + 1}";
                 ai.CharacterUserSetUp("Bot " + Random.Range(100, 999), Random.Range(0, characterSetUpLength), 1, i);
-                NetworkSpawn(ai.gameObject);
                 teamTwo.Add(ai.gameObject);
             }
         }
     }
 
-    public void NetworkSpawn(GameObject netObject)
-    {
-        if (NetcodeManager.Instance)
-            NetcodeManager.Instance.SpawnNetObject(netObject);
-    }
-
-    void AssignTeamId()
-    {
-        if (IsHost)
-        {
-            playersForTeamOne = 0;
-            playersForTeamTwo = 0;
-
-            PlayerManager[] players = FindObjectsOfType<PlayerManager>();
-
-            for (int i = 0; i < players.Length; i++)
-            {
-                int teamId = i % 2; // Alternate between 0 (TeamOne) and 1 (TeamTwo)
-
-                if (teamId == 0)
-                {
-                    players[i].AssignTeam(0, playersForTeamOne);
-                    playersForTeamOne++;
-                }
-                else
-                {
-                    players[i].AssignTeam(1, playersForTeamTwo);
-                    playersForTeamTwo++;
-                }
-            }
-        }
-    }
 
     int playersRegistered;
     public void AddToDetails(PlayerDetails playerDetails)
@@ -204,20 +129,6 @@ public class GameManager : NetworkBehaviour
             playersRegistered++;
 
             if (playersRegistered == teamSize * 2) gameStarted = true;
-        }
-    }
-
-    void HandleNetCodePlayerSpawn(int team, int teamId)
-    {
-        PlayerManager[] players = FindObjectsOfType<PlayerManager>();
-
-        foreach (PlayerManager player in players)
-        {
-            if (player.GetTeam == team && player.GetTeamID == teamId)
-            {
-                player.CreatePlayerController();
-                break;
-            }
         }
     }
 
@@ -260,61 +171,21 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    // Call this method when a kill is made
     public void RegisterKill(int team, int playerId)
     {
-        if (IsServer || !NetcodeManager.Instance) RegisterUpdateKillRPC(team, playerId);
-    }
-
-    public void RegisterDeath(int team, int playerId)
-    {
-        if (IsServer || !NetcodeManager.Instance) RegisterUpdateDeathRPC(team, playerId);
-    }
-
-    public void RegisterXP(int team, int playerId, int xpAmount)
-    {
-        if (IsServer || !NetcodeManager.Instance) RegisterUpdateXpAmountRPC(team, playerId, xpAmount);
-    }
-
-    [Rpc(SendTo.Everyone)]
-    public void RegisterUpdateKillRPC(int team, int playerId)
-    {
         characterDetails[team][playerId].PlayerKills++;
-
-        UpdatePlayerStatsCount(team, playerId, 1, "kills");
-
         // Check for the end of the game based on kills
         if ((totalTeamTwoKills >= maxKills || totalTeamTwoKills >= maxKills) && !isGameOver) EndGame();
     }
 
-    [Rpc(SendTo.Everyone)]
-    public void RegisterUpdateDeathRPC(int team, int playerId)
+    public void RegisterDeath(int team, int playerId)
     {
         characterDetails[team][playerId].PlayerDeaths++;
-
-        UpdatePlayerStatsCount(team, playerId, 1, "deaths");
     }
 
-    [Rpc(SendTo.Everyone)]
-    public void RegisterUpdateXpAmountRPC(int team, int playerId, int _xpAmount)
+    public void RegisterXP(int team, int playerId, int _xpAmount)
     {
         characterDetails[team][playerId].PlayerXP += _xpAmount;
-
-        UpdatePlayerStatsCount(team, playerId, _xpAmount, "xpAmount");//XP per Kill
-    }
-
-    public void UpdatePlayerStatsCount(int team, int playerId, int value, string statType)
-    {
-        PlayerManager[] players = FindObjectsOfType<PlayerManager>();
-
-        foreach (PlayerManager player in players)
-        {
-            if (player.GetTeam == team && player.GetTeamID == playerId)
-            {
-                player.UpdateStats(statType, value);
-                break;
-            }
-        }
     }
 
     private int GetAllTeamKills(PlayerDetails[] players)
@@ -378,13 +249,6 @@ public class GameManager : NetworkBehaviour
         {
             PlayFabNetManager.UpdateStats(GetMyGameXP, GetMyKills, GetMyDeaths, Random.Range(10, 25));
         }
-
-        NetManagerCheck[] netManagers = FindObjectsOfType<NetManagerCheck>();
-
-        foreach (var manager in netManagers)
-        {
-            Destroy(manager.gameObject);
-        }
     }
     private void PlayResultsAnimation(int current)
     {
@@ -392,7 +256,6 @@ public class GameManager : NetworkBehaviour
         SetUpManager.Instance.characterAnimator.Play("MatchResult");
     }
 
-    public void CloseGame() => NetworkManager.Singleton.Shutdown();
 
     // Enter final elimination mode if it's a draw after the timer runs out
     private void EnterFinalEliminationMode()
@@ -417,64 +280,31 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    public int GetPlayerId
+    {
+        get
+        {
+            // Loop through all the players
+            // Get which of them has a PhotonView that has the IsMine tag
+            // Get the playerId on it and return that value
+            return 0;
+        }
+    }
+
     public int GetMyTeam
     {
         get
         {
-            PlayerManager[] players = FindObjectsOfType<PlayerManager>();
-
-            foreach (var player in players)
-            {
-                if (player.GetComponent<NetworkObject>().IsOwner)
-                    return player.GetTeam;
-            }
-
+            // Loop through all the players
+            // Get which of them has a PhotonView that has the IsMine tag
+            // Get the team index on it and return that value
             return 0;
         }
     }
 
-    public int GetMyKills
-    {
-        get
-        {
-            PlayerManager[] players = FindObjectsOfType<PlayerManager>();
+    public int GetMyKills => characterDetails[GetMyTeam][GetPlayerId].PlayerKills;
 
-            foreach (var player in players)
-            {
-                if (player.GetComponent<NetworkObject>().IsOwner)
-                    return player.GetKills;
-            }
-            return 0;
-        }
-    }
+    public int GetMyDeaths => characterDetails[GetMyTeam][GetPlayerId].PlayerDeaths;
 
-    public int GetMyDeaths
-    {
-        get
-        {
-            PlayerManager[] players = FindObjectsOfType<PlayerManager>();
-
-            foreach (var player in players)
-            {
-                if (player.GetComponent<NetworkObject>().IsOwner)
-                    return player.GetDeaths;
-            }
-            return 0;
-        }
-    }
-
-    public int GetMyGameXP
-    {
-        get
-        {
-            PlayerManager[] players = FindObjectsOfType<PlayerManager>();
-
-            foreach (var player in players)
-            {
-                if (player.GetComponent<NetworkObject>().IsOwner)
-                    return player.GetXpAmount;
-            }
-            return 0;
-        }
-    }
+    public int GetMyGameXP => characterDetails[GetMyTeam][GetPlayerId].PlayerXP;
 }

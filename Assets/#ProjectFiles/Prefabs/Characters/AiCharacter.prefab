@@ -5223,7 +5223,6 @@ GameObject:
   - component: {fileID: 2174201756496465107}
   - component: {fileID: 6422998654208825101}
   - component: {fileID: 3683787330362315979}
-  - component: {fileID: 4806737604493623277}
   m_Layer: 0
   m_Name: BeraCharMesh
   m_TagString: Untagged
@@ -5283,20 +5282,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72c71bc4248d789499efa80701d0d8a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4806737604493623277
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3738444687460743319}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf0f19edbc07bb542a4070892b176e4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TransitionStateInfoList: []
-  m_Animator: {fileID: 6422998654208825101}
 --- !u!1 &3787968048909812983
 GameObject:
   m_ObjectHideFlags: 0
@@ -13695,8 +13680,6 @@ GameObject:
   - component: {fileID: 4030314579339234236}
   - component: {fileID: 1986438695485098024}
   - component: {fileID: 6806658130686265066}
-  - component: {fileID: 4387492641332871302}
-  - component: {fileID: 7880809489612590311}
   - component: {fileID: 4270298314480927566}
   - component: {fileID: 822248265971866593}
   - component: {fileID: 5337143692936397130}
@@ -13775,58 +13758,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &4387492641332871302
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8405135139318743821}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1947060284
-  InScenePlacedSourceGlobalObjectIdHash: 1891061094
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 1
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
---- !u!114 &7880809489612590311
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8405135139318743821}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UseUnreliableDeltas: 0
-  SyncPositionX: 1
-  SyncPositionY: 0
-  SyncPositionZ: 1
-  SyncRotAngleX: 0
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  Interpolate: 1
-  SlerpPosition: 0
 --- !u!114 &4270298314480927566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13880,6 +13811,7 @@ MonoBehaviour:
   moveSpeed: 5
   rotationSpeed: 700
   movementInput: {x: 0, y: 0}
+  moveDestination: {x: 0, y: 0, z: 0}
   aimInput: {x: 0, y: 0}
   IsAI: 1
   CanRotate: 1

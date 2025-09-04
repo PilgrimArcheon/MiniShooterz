@@ -1,11 +1,10 @@
 using System.Collections;
-using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterMovement))]
 [RequireComponent(typeof(CharacterShooter))]
 [RequireComponent(typeof(HealthSystem))]
-public class AICharacterController : NetworkBehaviour, ICombat
+public class AICharacterController : MonoBehaviour, ICombat
 {
     [Header("Character Settings")]
     [SerializeField] CharacterSetUp[] characterSetUp;
@@ -20,7 +19,6 @@ public class AICharacterController : NetworkBehaviour, ICombat
 
     private Animator animator;
 
-    private CharacterVariables characterVar = new();
 
     States currentState;
 
@@ -63,8 +61,6 @@ public class AICharacterController : NetworkBehaviour, ICombat
         movePointSet = false;
     }
 
-    public override void OnNetworkSpawn() { InvokeRepeating(nameof(UpdateCharVar), 0.15f, 2.5f); }
-
     bool hasSetUpVal;
     public void CharacterUserSetUp(string userId, int _charId, int team, int _id)
     {
@@ -89,7 +85,6 @@ public class AICharacterController : NetworkBehaviour, ICombat
         };
         GameManager.Instance.AddToDetails(playerDetails);
 
-        characterVar = new() { username = userId, charId = _charId, team = team, _id = _id };
         hasSetUpVal = true;
     }
 
@@ -120,17 +115,6 @@ public class AICharacterController : NetworkBehaviour, ICombat
         characterSetUp[rnd].ActivateCharacter(true);
     }
 
-    void UpdateCharVar()
-    {
-        if (IsOwner) UpdateCharVarRPC(characterVar.username, characterVar.charId, characterVar.team, characterVar._id);
-    }
-
-    [Rpc(SendTo.Everyone)]
-    void UpdateCharVarRPC(string username, int charId, int team, int _id)
-    {
-        CharacterUserSetUp(username, charId, team, _id);
-    }
-
     private void Update()
     {
         if (GameManager.Instance.isGameOver)
@@ -145,7 +129,7 @@ public class AICharacterController : NetworkBehaviour, ICombat
 
         HandleAIBehavior();
         HandleAnimations();
-        //HandleObstacleEncounter();
+        HandleObstacleEncounter();
     }
 
     private void CheckForOpponent()

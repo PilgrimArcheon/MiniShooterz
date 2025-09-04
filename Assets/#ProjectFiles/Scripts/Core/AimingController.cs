@@ -1,7 +1,6 @@
-using Unity.Netcode;
 using UnityEngine;
 
-public class AimingController : NetworkBehaviour
+public class AimingController : MonoBehaviour
 {
     [Header("Aim Settings")]
     public Transform aimPivot;// This will be rotated
@@ -34,7 +33,7 @@ public class AimingController : NetworkBehaviour
     {
         aimIndicator.SetActive(false);
 
-        if (!IsOwner || GameManager.Instance.isGameOver) return;
+        // if (!IsOwner || GameManager.Instance.isGameOver) return;
 
         HandleAimingInput();
 

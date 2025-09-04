@@ -30,9 +30,7 @@ public class AICameraSystem : MonoBehaviour
 
     // Update is called once per frame
     void ShuffleFocusChar()
-    {
-        if (NetcodeManager.Instance) return;
-        
+    {        
         if (GameManager.Instance.playersForTeamOne <= 0 || GameManager.Instance.playersForTeamTwo <= 0)
         {
             foreach (var vcam in virtualCameras)

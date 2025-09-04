@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class SetUpManager : MonoBehaviour
 {
     public static SetUpManager Instance { get; set; }
-
     void Awake() { Instance = this; }
 
     [Header("Gameplay Assets")]

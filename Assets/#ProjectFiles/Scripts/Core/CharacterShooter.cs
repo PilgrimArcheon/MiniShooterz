@@ -1,9 +1,8 @@
 using System;
 using System.Collections;
-using Unity.Netcode;
 using UnityEngine;
 
-public class CharacterShooter : NetworkBehaviour
+public class CharacterShooter : MonoBehaviour
 {
     public Weapon[] weapons;
     public int currentWeaponId;
@@ -65,7 +64,8 @@ public class CharacterShooter : NetworkBehaviour
 
     public void SwitchWeapon(int weaponId)
     {
-        if (IsOwner || NetcodeManager.Instance) SwitchWeaponRpc(weaponId);
+        OnSwitchWeapons?.Invoke();
+        SetWeapon(weaponId); // Switch the weapon
     }
 
     public void TryShoot()
@@ -84,12 +84,12 @@ public class CharacterShooter : NetworkBehaviour
 
         for (int i = 0; i < fireRate; i++)
         {
-            if (IsOwner || !NetcodeManager.Instance) SpawnBulletServerRpc();
+            SpawnBullet();
             yield return new WaitForSeconds(0.1f);
         }
 
         ammoCount--;
-        UpdateAmmoCountRpc(ammoCount);
+        UpdateAmmoCount(ammoCount);
         TryStartReloading();
     }
 
@@ -111,7 +111,7 @@ public class CharacterShooter : NetworkBehaviour
         if (reloadTimer >= weapons[currentWeaponId].reloadTime)
         {
             ammoCount++;
-            UpdateAmmoCountRpc(ammoCount);
+            UpdateAmmoCount(ammoCount);
             reloadTimer = 0f;
 
             if (ammoCount >= weapons[currentWeaponId].ammoCount)
@@ -134,24 +134,13 @@ public class CharacterShooter : NetworkBehaviour
     public bool CanShoot { get { return ammoCount > 0 && Time.time - lastShotTime >= shootCooldown; } }
     public Weapon GetCurWeapon { get { return weapons[currentWeaponId]; } }
 
-    [ServerRpc]
-    private void SpawnBulletServerRpc() // Spawn Bullet Only on server
+    private void SpawnBullet()
     {
-        NetworkObject bullet = NetworkObjectPool.Instance.GetNetworkObject(bulletPrefab, firePoint.position, firePoint.rotation);
-
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         Bullet bulletScript = bullet.GetComponent<Bullet>();
-        bulletScript.SetBullet(characterTeam, characterId, weapons[currentWeaponId]);  // Assign weaponId and team to the bullet
-
-        bullet.Spawn();
+        bulletScript.SetBullet(characterTeam, characterId, weapons[currentWeaponId]);
     }
 
-    [Rpc(SendTo.Everyone)]
-    private void SwitchWeaponRpc(int weaponId)
-    {
-        OnSwitchWeapons?.Invoke();
-        SetWeapon(weaponId); // Switch the weapon
-    }
 
-    [Rpc(SendTo.Everyone)]
-    private void UpdateAmmoCountRpc(int _ammoCount) => ammoCount = _ammoCount; // Update ammo count for all clients
+    private void UpdateAmmoCount(int _ammoCount) => ammoCount = _ammoCount;
 }

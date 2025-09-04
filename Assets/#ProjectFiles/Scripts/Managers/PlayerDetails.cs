@@ -1,5 +1,4 @@
 using System;
-using Unity.Netcode;
 
 [Serializable]
 public class PlayerDetails

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Netcode;
 using TMPro;
 using UnityEngine.SceneManagement;
 
@@ -12,7 +11,6 @@ public class LoadUp : MonoBehaviour
     [SerializeField] TMP_Text loadingText;//Text to show loading Percentage
     public string sceneToLoad = "MenuScene";
     public float loadSpeed = 0.5f;
-    [SerializeField] bool IsNetworkCode;
     bool startScene;
     float a;
 
@@ -20,11 +18,6 @@ public class LoadUp : MonoBehaviour
     {
         startScene = false;
         if (img) a = img.fillAmount;
-
-        IsNetworkCode = NetcodeManager.Instance;
-
-        if (IsNetworkCode) NetcodeManager.Instance.HostPlayer.LoadMenu(sceneToLoad);
-
     }
 
     public void UpdateSceneToOpen(string newSceneToOpen)
@@ -40,16 +33,7 @@ public class LoadUp : MonoBehaviour
 
         if (a >= 0.95f && !startScene) // When the colour gets to the value 0.1...
         {
-            if (!IsNetworkCode) StartCoroutine(LoadAsynchrously(sceneToLoad));
-            else
-            {
-                PlayerManager[] playerManagers = FindObjectsOfType<PlayerManager>();
-
-                foreach (var player in playerManagers)
-                {
-                    player.LoadGameScene(sceneToLoad);
-                }
-            }
+            StartCoroutine(LoadAsynchrously(sceneToLoad));
             startScene = true;
         }
     }

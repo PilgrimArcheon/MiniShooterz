@@ -1,11 +1,10 @@
 using System.Collections;
-using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterMovement))]
 [RequireComponent(typeof(CharacterShooter))]
 [RequireComponent(typeof(HealthSystem))]
-public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
+public class PlayerCharacterController : MonoBehaviour, ICombat, IStates
 {
     [Header("Character Settings")]
     [SerializeField] CharacterSetUp[] characterSetUp;
@@ -23,7 +22,6 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
 
     public string playerId;
 
-    private CharacterVariables characterVar = new();
     States currentState;
 
     public int charId;
@@ -43,13 +41,6 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
         playerInputHandler.SetInputController();
     }
 
-    public override void OnNetworkSpawn()
-    {
-        InvokeRepeating(nameof(UpdateCharVar), 0.15f, 2.5f);
-
-        Debug.Log("Spawned Character " + OwnerClientId);
-    }
-
     void OnEnable()
     {
         SetState(States.Base);
@@ -61,9 +52,7 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
     bool hasSetUpVal;
     public void CharacterUserSetUp(string userId, int _charId, int team, int _id)
     {
-        virtualCam.SetActive(IsOwner);
-
-        if (!IsOwner) playerInputHandler = null;
+        // virtualCam.SetActive(IsOwner);
 
         charId = _charId;
         playerId = userId;
@@ -87,15 +76,12 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
             PlayerTeam = team,
             PlayerId = id
         };
+
         GameManager.Instance.AddToDetails(playerDetails);
 
-        characterVar = new() { username = userId, charId = _charId, team = team, _id = _id };
         hasSetUpVal = true;
 
-        if (IsOwner)
-        {
-            audioListener = GameObject.Find("AudioListener").GetComponent<AudioListener>();
-        }
+        audioListener = GameObject.Find("AudioListener").GetComponent<AudioListener>();
     }
 
     void SetUpCharacter(int charId)
@@ -126,24 +112,9 @@ public class PlayerCharacterController : NetworkBehaviour, ICombat, IStates
         aimingController.oppLayer = LayerMask.GetMask(oppLayer); // Set player's Opp team
     }
 
-    void UpdateCharVar()
-    {
-        if (IsServer)
-        {
-            UpdateCharVarClientRPC(characterVar.username, characterVar.charId, characterVar.team, characterVar._id);
-        }
-    }
-
-    [Rpc(SendTo.Everyone)]
-    void UpdateCharVarClientRPC(string username, int charId, int team, int _id)
-    {
-        CharacterUserSetUp(username, charId, team, _id);
-    }
 
     private void Update()
     {
-        if (!IsOwner) return;
-
         playerInputHandler.enabled = true;
 
         if (GameManager.Instance.isGameOver)

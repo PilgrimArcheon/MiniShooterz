@@ -26338,7 +26338,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 0}
   m_Lens:
-    FieldOfView: 92
+    FieldOfView: 80
     OrthographicSize: 5
     NearClipPlane: 0.3
     FarClipPlane: 1479.5
@@ -47408,7 +47408,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 0}
   m_Lens:
-    FieldOfView: 94
+    FieldOfView: 80
     OrthographicSize: 5
     NearClipPlane: 0.3
     FarClipPlane: 1479.5
@@ -51740,6 +51740,85 @@ Transform:
   - {fileID: 1891372662}
   m_Father: {fileID: 1780862298}
   m_LocalEulerAnglesHint: {x: 68.19615, y: 61.60305, z: 101.45519}
+--- !u!1 &1479839601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1479839603}
+  - component: {fileID: 1479839602}
+  - component: {fileID: 1479839604}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1479839602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1479839601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e80f6ab28c1849b4696d28d79e44aa47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxKills: 10
+  gameTimeLimit: 300
+  teamSize: 3
+  characterSetUpLength: 3
+  teamOne: []
+  teamTwo: []
+  playerTeam: 0
+  playerPoints: 0
+  MovePoints:
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  playersForTeamOne: 1
+  playersForTeamTwo: 0
+  totalTeamOneKills: 0
+  totalTeamTwoKills: 0
+  timer: 0
+  gameStarted: 0
+  isGameOver: 0
+  isInFinalEliminationMode: 0
+  forcedMobile: 0
+  IsMultiplayer: 0
+--- !u!4 &1479839603
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1479839601}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 37.236504, y: 5.555145, z: -9.978565}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1479839604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1479839601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fb07f6f52c616b46b00bc27b1193bdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnInterval: 5
 --- !u!1 &1482257345
 GameObject:
   m_ObjectHideFlags: 0
@@ -56467,7 +56546,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 0}
   m_Lens:
-    FieldOfView: 88
+    FieldOfView: 83
     OrthographicSize: 5
     NearClipPlane: 0.3
     FarClipPlane: 1479.5
@@ -64034,7 +64113,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 0}
   m_Lens:
-    FieldOfView: 83
+    FieldOfView: 81
     OrthographicSize: 5
     NearClipPlane: 0.3
     FarClipPlane: 1479.5
@@ -89781,7 +89860,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5422351305254627429}
-  - component: {fileID: 8872839337903337690}
   - component: {fileID: 8872839337903337691}
   m_Layer: 0
   m_Name: SetUpManager
@@ -134149,27 +134227,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &8872839337903337690
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2560699797312533566}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 14228115
-  InScenePlacedSourceGlobalObjectIdHash: 4129668779
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &8872839337903337691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137024,3 +137081,4 @@ SceneRoots:
   - {fileID: 1369648397}
   - {fileID: 94540096}
   - {fileID: 1646907115}
+  - {fileID: 1479839603}

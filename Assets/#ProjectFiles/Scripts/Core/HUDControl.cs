@@ -1,12 +1,10 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HUDControl : NetworkBehaviour
+public class HUDControl : MonoBehaviour
 {
     private bool hasSetUp;
     private GameObject hudUI;
@@ -91,7 +89,7 @@ public class HUDControl : NetworkBehaviour
 
         healthSlider.value = healthSystem.currentHealth / healthSystem.maxHealth;
         healthSlider.transform.GetChild(1).GetChild(0).GetComponent<Image>().color = characterTeam == GameManager.Instance.GetMyTeam ? Color.cyan : Color.red;
-        if (IsOwner && !isAI) healthSlider.transform.GetChild(1).GetChild(0).GetComponent<Image>().color = Color.green;
+        if (!isAI) healthSlider.transform.GetChild(1).GetChild(0).GetComponent<Image>().color = Color.green;
     }
 
     private void UserDetailsUpdate()
@@ -113,7 +111,7 @@ public class HUDControl : NetworkBehaviour
     {
         if (bulletCountHolder == null) return;
 
-        bulletCountHolder.SetActive(IsOwner && !isAI);
+        bulletCountHolder.SetActive(!isAI);
 
         int currentAmmo = characterShooter.ammoCount;
         int maxAmmo = characterShooter.GetCurWeapon.ammoCount;
