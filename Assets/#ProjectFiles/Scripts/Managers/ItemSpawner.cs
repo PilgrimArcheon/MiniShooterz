@@ -64,10 +64,11 @@ public class ItemSpawner : MonoBehaviour
     {
         int index = itemBoxes.IndexOf(itemBox);
         if (spawnedTransList.Count > index)
+        {
             spawnPoints.Add(spawnedTransList[index]);
-
-        Debug.Log("Destroy Item Box");
-        spawnedTransList.Remove(spawnedTransList[index]);
+            spawnedTransList.Remove(spawnedTransList[index]);
+        }
+        
         Destroy(itemBox.gameObject);
     }
 }

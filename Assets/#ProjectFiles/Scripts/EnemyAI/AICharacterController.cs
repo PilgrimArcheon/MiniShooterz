@@ -145,7 +145,7 @@ public class AICharacterController : MonoBehaviour, ICombat
         {
             if (!opponentInSightRange && !opponentInShootRange) Patrol();
             if (opponentInSightRange && !opponentInShootRange) Chase();
-            if (opponentInSightRange && opponentInShootRange) Shoot();
+            if (opponentInSightRange && opponentInShootRange) HandleCombatDecision();
         }
         else Evade();
 
@@ -206,6 +206,19 @@ public class AICharacterController : MonoBehaviour, ICombat
         }
     }
 
+    private void HandleCombatDecision()
+    {
+        bool performAbility = false;
+        if (characterShooter.CanUseAbility)
+        {
+            int chanceToUse = Random.Range(0, 101);
+            if (chanceToUse < 1) performAbility = true;
+        }
+
+        if (performAbility) UseAbility();
+        else Shoot();
+    }
+
     // Handle AI towards the Shooting Opponent
     private void Shoot()
     {
@@ -213,12 +226,28 @@ public class AICharacterController : MonoBehaviour, ICombat
         else
         {
             SetState(States.Shoot);
-            Vector3 shootDirection = (targetTransform.position - transform.position).normalized;
-            shootDirection.y = 0;
+            Vector3 lookDir = (targetTransform.position - transform.position).normalized;
+            lookDir.y = 0;
             movePosition = targetTransform.position;
             characterMovement.SetCanRotate(false);
-            characterMovement.SetAimInput(new Vector2(shootDirection.x, shootDirection.z));
+            characterMovement.SetAimInput(new Vector2(lookDir.x, lookDir.z));
             characterShooter.TryShoot();
+            targetTransform = null;
+        }
+    }
+
+    private void UseAbility()
+    {
+        if (targetTransform == null) GetClosestOpponent();
+        else
+        {
+            SetState(States.Shoot);
+            Vector3 lookDir = (targetTransform.position - transform.position).normalized;
+            lookDir.y = 0;
+            movePosition = targetTransform.position;
+            characterMovement.SetCanRotate(false);
+            characterMovement.SetAimInput(new Vector2(lookDir.x, lookDir.z));
+            characterShooter.TryUseAbility();
             targetTransform = null;
         }
     }
@@ -290,6 +319,13 @@ public class AICharacterController : MonoBehaviour, ICombat
         animator.SetLayerWeight(1, 1);
         animator.Play("Shoot", 1, 0f);
         StartCoroutine(SwitchStateDelay(States.Base, shootTime));
+    }
+
+    public void PerformAbility()
+    {
+        animator.SetLayerWeight(1, 1);
+        animator.Play("Ability", 1, 0f);
+        StartCoroutine(SwitchStateDelay(States.Base, 2f));
     }
 
     public void SetState(States state)

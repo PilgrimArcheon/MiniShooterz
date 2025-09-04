@@ -5,21 +5,23 @@ using UnityEngine;
 public class CharacterShooter : MonoBehaviour
 {
     public Weapon[] weapons;
+    public Ability[] characterAbilities;
+    public Ability ability;
     public int currentWeaponId;
 
     [Header("Shooting Settings")]
     public GameObject bulletPrefab;
     public Transform firePoint;
-    public GameObject aimObjectVfx;
-
     public float maxDistance;
     public int fireRate = 1;
     public float shootCooldown;
     public int ammoCount = 1;
     float lastShotTime;
+    float lastAbilityTime;
     public bool isAI;
     public Action OnSwitchWeapons;
     public Action<float, float> OnLoadBullets;
+    public Action<float, float> OnUseAbility;
 
     int characterTeam;  // Reference to the team (Red or Blue)
     int characterId;
@@ -29,6 +31,7 @@ public class CharacterShooter : MonoBehaviour
         SetWeapon(weaponId);
         characterId = id;
         characterTeam = team;
+        ability = characterAbilities[SaveManager.Instance.state.charId];
     }
 
     void SetWeapon(int weaponId)
@@ -77,6 +80,16 @@ public class CharacterShooter : MonoBehaviour
         }
     }
 
+    public void TryUseAbility()
+    {
+        if (CanUseAbility)
+        {
+            StartCoroutine(PerformAbility());
+            lastAbilityTime = Time.time;
+            OnUseAbility?.Invoke(lastAbilityTime, ability.coolDown);
+        }
+    }
+
     // Shoot a bullet in the given direction
     private IEnumerator Shoot()
     {
@@ -91,6 +104,15 @@ public class CharacterShooter : MonoBehaviour
         ammoCount--;
         UpdateAmmoCount(ammoCount);
         TryStartReloading();
+    }
+
+    private IEnumerator PerformAbility()
+    {
+        yield return new WaitForSeconds(ability.spawnTime);
+        gameObject.GetComponent<ICombat>().PerformAbility();
+        Transform spawnPoint = ability.AbilitySpawnPoint;
+        AbilityAOE abilityAOE = Instantiate(ability.AbilityPrefab, spawnPoint.position, Quaternion.identity).GetComponent<AbilityAOE>();
+        abilityAOE.SetAbilityAOE(characterTeam, characterId, ability.abilityDamage);
     }
 
     void Update()
@@ -131,6 +153,7 @@ public class CharacterShooter : MonoBehaviour
         }
     }
 
+    public bool CanUseAbility { get { return Time.time - lastAbilityTime >= ability.coolDown; } }
     public bool CanShoot { get { return ammoCount > 0 && Time.time - lastShotTime >= shootCooldown; } }
     public Weapon GetCurWeapon { get { return weapons[currentWeaponId]; } }
 

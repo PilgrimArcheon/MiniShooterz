@@ -17,6 +17,7 @@ public class AimingController : MonoBehaviour
     private Camera mainCamera;
 
     [SerializeField] private GameObject aimIndicator;
+    [SerializeField] private GameObject abilityAimIndicator;
 
     private void Start()
     {
@@ -33,23 +34,44 @@ public class AimingController : MonoBehaviour
     {
         aimIndicator.SetActive(false);
 
+        abilityAimIndicator.SetActive(false);
         // if (!IsOwner || GameManager.Instance.isGameOver) return;
 
+        joyStick = playerInputHandler.playerInput.currentControlScheme == "Gamepad";
+
         HandleAimingInput();
+        HandleAbilityAimingInput();
 
         aimPivot.position = new(transform.position.x, aimPivot.position.y, transform.position.z);
     }
 
     Vector3 aimInput;
+
     private void HandleAimingInput()
     {
-        if (!characterShooter.CanShoot) return; // Don't aim if we can't shoot
+        if (!characterShooter.CanShoot) return; // Don't aim if we can't shoot 
 
         bool isAiming = playerInputHandler.IsAimingInput;
 
-        joyStick = playerInputHandler.playerInput.currentControlScheme == "Gamepad";
-
         aimIndicator.SetActive(isAiming);
+
+        FinalAim(isAiming);
+    }
+
+    void HandleAbilityAimingInput()
+    {
+        if (!characterShooter.CanUseAbility) return; // Don't aim if we can't use ability
+
+        bool isAiming = playerInputHandler.IsAimingInput && playerInputHandler.IsAbilityInput;
+
+        abilityAimIndicator.SetActive(isAiming);
+
+        FinalAim(isAiming);
+    }
+
+    void FinalAim(bool isAiming)
+    {
+        float aimMaxDistance = playerInputHandler.IsAbilityInput ? characterShooter.ability.areaOfEffectMaxDistance : characterShooter.maxDistance;
 
         if (!joyStick && !playerInputHandler.IsMobile)
         {
@@ -60,7 +82,7 @@ public class AimingController : MonoBehaviour
                 Vector3 inputDir = hitInfo.point - transform.position;
                 inputDir.y = 0;
                 inputDir.Normalize();
-                aimFollow.position = aimPivot.position + (inputDir * characterShooter.maxDistance);
+                aimFollow.position = aimPivot.position + (inputDir * aimMaxDistance);
             }
         }
         else
@@ -70,7 +92,7 @@ public class AimingController : MonoBehaviour
             Vector3 inputDir = new(horizontal, 0f, vertical);
             inputDir.Normalize();
             if (inputDir.magnitude > 0.1f)
-                aimFollow.position = aimPivot.position + (inputDir * characterShooter.maxDistance);
+                aimFollow.position = aimPivot.position + (inputDir * aimMaxDistance);
         }
 
         if (isAiming)
@@ -89,6 +111,7 @@ public class AimingController : MonoBehaviour
         if (startedAiming && !isAiming) FireWeapon();
     }
 
+    bool isAbilityAim;
     void CalculateAim()
     {
         Vector3 origin = aimPivot.position;
@@ -103,24 +126,37 @@ public class AimingController : MonoBehaviour
         else endPoint = aimFollow.position;
 
         // Draw the shot
-        int weaponId = characterShooter.currentWeaponId;
-        Weapon weapon = characterShooter.weapons[weaponId];
-        RectTransform rectTransform = weapon.WeaponAimVfx.GetComponent<RectTransform>();
+        if (playerInputHandler.IsAbilityInput)
+        {
+            Ability ability = characterShooter.ability;
+            Transform abilityAimTrans = ability.AbilityAimVfx.transform;
+            abilityAimTrans.position = endPoint;
+            isAbilityAim = true;
+        }
+        else
+        {
+            int weaponId = characterShooter.currentWeaponId;
+            Weapon weapon = characterShooter.weapons[weaponId];
+            RectTransform rectTransform = weapon.WeaponAimVfx.GetComponent<RectTransform>();
 
-        // Convert the distance from world space to local canvas units
-        Vector3 localStart = rectTransform.InverseTransformPoint(origin);
-        Vector3 localEnd = rectTransform.InverseTransformPoint(endPoint);
-        float localHeight = Mathf.Abs(localEnd.y - localStart.y);
+            // Convert the distance from world space to local canvas units
+            Vector3 localStart = rectTransform.InverseTransformPoint(origin);
+            Vector3 localEnd = rectTransform.InverseTransformPoint(endPoint);
+            float localHeight = Mathf.Abs(localEnd.y - localStart.y);
 
-        // Update the RectTransform height (Y axis only)
-        Vector2 size = rectTransform.sizeDelta;
-        size.y = localHeight;
-        rectTransform.sizeDelta = size;
+            // Update the RectTransform height (Y axis only)
+            Vector2 size = rectTransform.sizeDelta;
+            size.y = localHeight;
+            rectTransform.sizeDelta = size;
+        }
     }
 
     private void FireWeapon()
     {
-        ShootInDirection(aimFollow.position);
+        if (isAbilityAim) StartAbilitySpawn(aimFollow.position);
+        else ShootInDirection(aimFollow.position);
+
+        isAbilityAim = false;
         startedAiming = false;
     }
 
@@ -167,6 +203,11 @@ public class AimingController : MonoBehaviour
     void ShootInDirection(Vector3 aimDir)
     {
         GetComponent<PlayerCharacterController>().HandleShooting(aimDir);
+    }
+
+    void StartAbilitySpawn(Vector3 startPos)
+    {
+        GetComponent<PlayerCharacterController>().HandleAbility(startPos);
     }
 
     void OnDrawGizmos()

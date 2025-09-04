@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEditorInternal;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterMovement))]
@@ -159,12 +160,35 @@ public class PlayerCharacterController : MonoBehaviour, ICombat, IStates
         }
     }
 
+    public void HandleAbility(Vector3 aimDir)
+    {
+        States[] statesToCheck = new States[] { States.Shoot, States.TakingDamage };
+
+        if (!CheckCurrentState(statesToCheck) && characterShooter.CanShoot)
+        {
+            SetState(States.Shoot);
+            Vector3 shootDirection = (aimDir - transform.position).normalized;
+            shootDirection.y = 0;
+            transform.LookAt(aimDir);
+            characterMovement.SetCanRotate(false);
+            characterMovement.SetAimInput(new Vector2(shootDirection.x, shootDirection.z));
+            characterShooter.TryUseAbility();
+        }
+    }
+
     #region Implemented Interface
     public void PerformShoot(float shootTime)
     {
         animator.SetLayerWeight(1, 1);
         animator.Play("Shoot", 1, 0f);
         StartCoroutine(SwitchStateDelay(States.Base, shootTime));
+    }
+
+    public void PerformAbility()
+    {
+        animator.SetLayerWeight(1, 1);
+        animator.Play("Ability", 1, 0f);
+        StartCoroutine(SwitchStateDelay(States.Base, 2f));
     }
 
     public void SetState(States state)

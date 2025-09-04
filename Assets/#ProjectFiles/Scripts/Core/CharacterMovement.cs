@@ -81,5 +81,6 @@ public enum States
 {
     Base,
     Shoot,
-    TakingDamage
+    Ability,
+    TakingDamage    
 }

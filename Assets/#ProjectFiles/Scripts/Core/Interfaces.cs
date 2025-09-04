@@ -1,6 +1,7 @@
 public interface ICombat
 {
     public void PerformShoot(float shootTime);
+    public void PerformAbility();
     public void TakeDamage();
 }
 

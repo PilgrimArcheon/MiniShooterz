@@ -33,6 +33,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "AbilityInput",
+                    "type": "Button",
+                    "id": "6da10192-ffdd-4859-91a5-2379127148e7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "JumpInput",
                     "type": "Button",
                     "id": "0f9d76e3-7a4e-4d5f-851a-b6b267db8877",
@@ -258,6 +267,28 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "InteractInput",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c5b653ef-624e-4e0d-a83f-04b09b81732a",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "AbilityInput",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "980c8d23-c185-4a28-a7dd-a33e7af1f66d",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AbilityInput",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

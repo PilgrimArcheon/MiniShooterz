@@ -75,6 +75,17 @@ public class AudioManager : MonoBehaviour
         sfx.transform.parent = sfxAudioSource.transform;
         Destroy(sfx, sfxAudioClip[(int)soundEffect].length);
     }
+
+    public void PlaySoundEfx(AudioClip _sfxAudioClip, Vector3 vectorPos)
+    {
+        AudioSource sfx = new GameObject($"{_sfxAudioClip.name}").AddComponent<AudioSource>();
+        sfx.volume = SaveManager.Instance.state.volumeSettings[1];
+        sfx.spatialBlend = 0.75f;
+        sfx.transform.position = vectorPos;
+        sfx.PlayOneShot(_sfxAudioClip);
+        sfx.transform.parent = sfxAudioSource.transform;
+        Destroy(sfx, _sfxAudioClip.length);
+    }
 }
 
 public enum UISoundFx

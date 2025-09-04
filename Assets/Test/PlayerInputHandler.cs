@@ -8,14 +8,17 @@ public class PlayerInputHandler : MonoBehaviour
     public PlayerInput playerInput;
     public FloatingJoystick mobileMoveInput;
     public FloatingJoystick mobileAimInput;
+    public FloatingJoystick mobileAbilityAimInput;
     public Vector2 MovementInput { get; private set; }
     public Vector2 AimDirectionInput { get; private set; }
     public bool IsAimingInput { get; private set; }
+    public bool IsAbilityInput { get; private set; }
     public bool JumpInput { get; private set; }
     public UnityAction InteractAction;
     private Vector2 MoveInput;
     private Vector2 AimInput;
     private bool ActiveAim;
+    private bool AbilityAim;
 
     public bool IsMobile { get { return GameManager.Instance.forcedMobile || MenuManager.Instance.IsWebMobile(); } }
     void Awake()
@@ -29,21 +32,24 @@ public class PlayerInputHandler : MonoBehaviour
     {
         mobileMoveInput = GameObject.Find("MobileMoveInput").GetComponent<FloatingJoystick>();
         mobileAimInput = GameObject.Find("MobileAimInput").GetComponent<FloatingJoystick>();
+        mobileAbilityAimInput = GameObject.Find("MobileAbilityAimInput").GetComponent<FloatingJoystick>();
         hasSetController = true;
     }
 
     private void Update()
     {
         if (!hasSetController) return;
+        IsAbilityInput = IsMobile ? mobileAbilityAimInput.IsActive : AbilityAim;
+
+        IsAimingInput = IsMobile ? mobileAimInput.IsActive : ActiveAim;
 
         MovementInput = IsMobile ? GetInputVector(mobileMoveInput.Direction) : GetInputVector(MoveInput);
-        AimDirectionInput = IsMobile ? GetInputVector(mobileAimInput.Direction) : GetInputVector(AimInput);
-        IsAimingInput = IsMobile ? mobileAimInput.IsActive : ActiveAim;
+        AimDirectionInput = IsMobile ? GetInputVector(IsAbilityInput ? mobileAbilityAimInput.Direction : mobileAimInput.Direction) : GetInputVector(AimInput);
     }
 
     public void OnMovementInput(InputAction.CallbackContext context)
     {
-        MoveInput = context.ReadValue<Vector2>(); 
+        MoveInput = context.ReadValue<Vector2>();
     }
 
     Vector2 GetInputVector(Vector2 input)
@@ -78,6 +84,12 @@ public class PlayerInputHandler : MonoBehaviour
     {
         if (context.started) ActiveAim = true;
         else if (context.canceled) ActiveAim = false;
+    }
+
+    public void OnAbilityInput(InputAction.CallbackContext context)
+    {
+        if (context.started) AbilityAim = true;
+        else if (context.canceled) AbilityAim = false;
     }
 
     public void OnInteractInput(InputAction.CallbackContext context)
