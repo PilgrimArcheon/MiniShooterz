@@ -31,7 +31,7 @@ public class Bullet : MonoBehaviour
         InitBullet();
 
         rigidbody = GetComponent<Rigidbody>();
-        rigidbody.velocity = rigidbody.transform.forward * weapon.bulletSpeed;
+        rigidbody.linearVelocity = rigidbody.transform.forward * weapon.bulletSpeed;
     }
 
     void FixedUpdate()
@@ -57,7 +57,7 @@ public class Bullet : MonoBehaviour
 
                 Instantiate(bulletHitEffect, transform.position, transform.rotation);
 
-                rigidbody.velocity = Vector3.zero;
+                rigidbody.linearVelocity = Vector3.zero;
                 lifeTime = Time.time - 1f;
 
                 AudioManager.Instance.PlaySfx(SoundEffect.BulletDrop, transform.position);

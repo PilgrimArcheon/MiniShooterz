@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CharacterShooter : MonoBehaviour
 {
@@ -17,11 +18,12 @@ public class CharacterShooter : MonoBehaviour
     public float shootCooldown;
     public int ammoCount = 1;
     float lastShotTime;
+    [Header("Ability Settings")]
+    [SerializeField] Image abilityCoolDown;
     float lastAbilityTime;
     public bool isAI;
     public Action OnSwitchWeapons;
     public Action<float, float> OnLoadBullets;
-    public Action<float, float> OnUseAbility;
 
     int characterTeam;  // Reference to the team (Red or Blue)
     int characterId;
@@ -86,7 +88,7 @@ public class CharacterShooter : MonoBehaviour
         {
             StartCoroutine(PerformAbility());
             lastAbilityTime = Time.time;
-            OnUseAbility?.Invoke(lastAbilityTime, ability.coolDown);
+            OnUseAbility(lastAbilityTime, ability.coolDown);
         }
     }
 
@@ -118,6 +120,7 @@ public class CharacterShooter : MonoBehaviour
     void Update()
     {
         HandleReloadAmmo();
+        UpdateAbilityUseCoolDown();
     }
 
     private bool isReloading = false;
@@ -162,6 +165,34 @@ public class CharacterShooter : MonoBehaviour
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.SetBullet(characterTeam, characterId, weapons[currentWeaponId]);
+    }
+
+    bool abilityCoolingDown;
+    float abilityUsedTime;
+    float abilityCoolDownTime;
+    void OnUseAbility(float time, float totalTime)
+    {
+        abilityUsedTime = time;
+        abilityCoolDownTime = totalTime;
+        abilityCoolingDown = true;
+    }
+
+    void UpdateAbilityUseCoolDown()
+    {
+        if (!abilityCoolingDown) return;
+
+        float fillAmount = 0;
+        if (!isAI || abilityCoolDown)
+        {
+            fillAmount = (Time.time - abilityUsedTime) / abilityCoolDownTime;
+            abilityCoolDown.fillAmount = fillAmount;
+        }
+
+        if (fillAmount >= 1)
+        {
+            abilityCoolDown.fillAmount = 1;
+            abilityCoolingDown = false;
+        }
     }
 
 

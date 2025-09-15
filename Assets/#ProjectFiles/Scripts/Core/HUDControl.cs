@@ -10,7 +10,6 @@ public class HUDControl : MonoBehaviour
     private GameObject hudUI;
     private GameObject bulletCountHolder;
     private List<Image> bulletCountUi = new();
-    private Image abilityCoolDown;
     private Slider healthSlider;
     private TMP_Text userName;
     public bool isAI;
@@ -27,7 +26,6 @@ public class HUDControl : MonoBehaviour
         healthSystem.OnStateChange += OnStateChange; // Set up State Change Event
         characterShooter.OnLoadBullets += OnLoadBullets;// Set up Load Bullets Event
         characterShooter.OnSwitchWeapons += OnSwitchWeapons; // Set up Weapon Switch Event
-        characterShooter.OnUseAbility += OnUseAbility; // Set up Use Ability Event
     }
 
     private void OnSwitchWeapons()
@@ -61,9 +59,6 @@ public class HUDControl : MonoBehaviour
         userName = hudTransform.GetChild(0).GetComponent<TMP_Text>();
         healthSlider = hudTransform.GetChild(1).GetComponent<Slider>();
         bulletCountHolder = hudTransform.GetChild(2).gameObject;
-
-        abilityCoolDown = userName.transform.GetChild(0).GetChild(0).GetComponent<Image>(); // IS MINE
-        abilityCoolDown.transform.parent.gameObject.SetActive(false);
         
         OnSwitchWeapons();
 
@@ -77,7 +72,6 @@ public class HUDControl : MonoBehaviour
     {
         UpdateHealthDetails();
         UserDetailsUpdate();
-        UpdateAbilityUseCoolDown();
         UpdateShooterBulletCount();
         UpdateHUDUIPosition();
     }
@@ -119,7 +113,6 @@ public class HUDControl : MonoBehaviour
         if (bulletCountHolder == null) return;
 
         bulletCountHolder.SetActive(!isAI);
-        abilityCoolDown.gameObject.SetActive(!isAI);
 
         int currentAmmo = characterShooter.ammoCount;
         int maxAmmo = characterShooter.GetCurWeapon.ammoCount;
@@ -141,35 +134,6 @@ public class HUDControl : MonoBehaviour
                 // Empty bullets
                 bulletCountUi[i].fillAmount = 0f;
             }
-        }
-    }
-
-    bool abilityCoolingDown;
-    float abilityUsedTime;
-    float abilityCoolDownTime;
-    void OnUseAbility(float time, float totalTime)
-    {
-        abilityCoolingDown = true;
-        abilityUsedTime = time;
-        abilityCoolDownTime = totalTime;
-    }
-
-    void UpdateAbilityUseCoolDown()
-    {
-        if (!abilityCoolingDown) return;
-
-        float fillAmount = 0;
-        if (!isAI || abilityCoolDown)
-        {
-            abilityCoolDown.transform.parent.gameObject.SetActive(true);
-            fillAmount = (Time.time - abilityUsedTime) / abilityCoolDownTime;
-            abilityCoolDown.fillAmount = fillAmount;
-        }
-
-        if (fillAmount >= 1)
-        {
-            abilityCoolDown.transform.parent.gameObject.SetActive(false);
-            abilityCoolingDown = false;
         }
     }
 

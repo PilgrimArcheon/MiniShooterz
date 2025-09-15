@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using System.Collections;
 using UnityEngine.UI;
 
-public class LobbyManager : MonoBehaviour
+public class RoomManager : MonoBehaviour
 {
-    public static LobbyManager Instance { get; set; }
+    public static RoomManager Instance { get; set; }
 
     
 }

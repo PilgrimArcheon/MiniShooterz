@@ -8,7 +8,7 @@ public class PlayerInputHandler : MonoBehaviour
     public PlayerInput playerInput;
     public FloatingJoystick mobileMoveInput;
     public FloatingJoystick mobileAimInput;
-    public FloatingJoystick mobileAbilityAimInput;
+    public FixedButton mobileAbilityAimInput;
     public Vector2 MovementInput { get; private set; }
     public Vector2 AimDirectionInput { get; private set; }
     public bool IsAimingInput { get; private set; }
@@ -32,7 +32,7 @@ public class PlayerInputHandler : MonoBehaviour
     {
         mobileMoveInput = GameObject.Find("MobileMoveInput").GetComponent<FloatingJoystick>();
         mobileAimInput = GameObject.Find("MobileAimInput").GetComponent<FloatingJoystick>();
-        mobileAbilityAimInput = GameObject.Find("MobileAbilityAimInput").GetComponent<FloatingJoystick>();
+        mobileAbilityAimInput = GameObject.Find("MobileAbilityAimInput").GetComponent<FixedButton>();
         hasSetController = true;
     }
 
@@ -44,7 +44,7 @@ public class PlayerInputHandler : MonoBehaviour
         IsAimingInput = IsMobile ? mobileAimInput.IsActive : ActiveAim;
 
         MovementInput = IsMobile ? GetInputVector(mobileMoveInput.Direction) : GetInputVector(MoveInput);
-        AimDirectionInput = IsMobile ? GetInputVector(IsAbilityInput ? mobileAbilityAimInput.Direction : mobileAimInput.Direction) : GetInputVector(AimInput);
+        AimDirectionInput = IsMobile ? GetInputVector(mobileAimInput.Direction) : GetInputVector(AimInput);
     }
 
     public void OnMovementInput(InputAction.CallbackContext context)
@@ -88,9 +88,11 @@ public class PlayerInputHandler : MonoBehaviour
 
     public void OnAbilityInput(InputAction.CallbackContext context)
     {
-        if (context.started) AbilityAim = true;
-        else if (context.canceled) AbilityAim = false;
+        if (context.started) AbilityAim = !AbilityAim;
+        //else if (context.canceled) AbilityAim = false;
     }
+
+    public void ResetAbility() => AbilityAim = false;
 
     public void OnInteractInput(InputAction.CallbackContext context)
     {
