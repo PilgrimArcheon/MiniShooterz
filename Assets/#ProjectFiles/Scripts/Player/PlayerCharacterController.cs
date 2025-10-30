@@ -1,5 +1,4 @@
 using System.Collections;
-using UnityEditorInternal;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterMovement))]
@@ -19,7 +18,7 @@ public class PlayerCharacterController : MonoBehaviour, ICombat, IStates
     private HUDControl hUDControl;
     private Animator animator;
     private Vector2 movementInput;
-    private AudioListener audioListener;
+    private AudioListener audioListener; 
 
     public string playerId;
 
