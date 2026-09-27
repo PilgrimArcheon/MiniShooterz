@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(CharacterMovement))]
 [RequireComponent(typeof(CharacterShooter))]
@@ -19,7 +20,6 @@ public class AICharacterController : MonoBehaviour, ICombat
 
     private Animator animator;
 
-
     States currentState;
 
     [Header("AI Behavior Settings")]
@@ -31,9 +31,11 @@ public class AICharacterController : MonoBehaviour, ICombat
     public float detectionRadius = 10f;
     public float shootRadius = 5f;
     bool movePointSet;
-
     Vector2 movementInput;
     Vector3 movePosition;
+
+    private float aiStrafeTimer;
+    private int aiStrafeDirection = 1;
 
     public int charId;
     public int aiTeam;  // AI team
@@ -155,7 +157,25 @@ public class AICharacterController : MonoBehaviour, ICombat
 
     private void HandleAnimations()
     {
-        animator.SetBool("move", movementInput.magnitude > 0f);
+        bool hasTarget = targetTransform != null;
+        animator.SetBool("hasTarget", hasTarget);
+
+        // Get the ACTUAL physical velocity from the NavMeshAgent
+        Vector3 currentVelocity = characterMovement.GetVelocity();
+        float currentSpeed = currentVelocity.magnitude;
+
+        animator.SetBool("move", currentSpeed > 0.1f);
+        animator.SetFloat("movement", currentSpeed > 0.1f ? 1f : 0f);
+
+        // Convert true velocity to local space for accurate strafing animations
+        Vector3 localVelocity = transform.InverseTransformDirection(currentVelocity);
+
+        // Normalize the values (-1 to 1) based on moveSpeed so the Blend Tree reads them cleanly
+        float animX = localVelocity.x / characterMovement.moveSpeed;
+        float animY = localVelocity.z / characterMovement.moveSpeed;
+
+        animator.SetFloat("moveX", hasTarget ? animX : 0f);
+        animator.SetFloat("moveY", hasTarget ? animY : 0f);
         animator.SetFloat("weaponId", characterShooter.currentWeaponId);
     }
 
@@ -220,19 +240,41 @@ public class AICharacterController : MonoBehaviour, ICombat
     }
 
     // Handle AI towards the Shooting Opponent
-    private void Shoot()
+    private void Shoot() 
     {
-        if (targetTransform == null) GetClosestOpponent();
+        if (targetTransform == null) GetClosestOpponent(); 
         else
-        {
-            SetState(States.Shoot);
-            Vector3 lookDir = (targetTransform.position - transform.position).normalized;
-            lookDir.y = 0;
-            movePosition = targetTransform.position;
-            characterMovement.SetCanRotate(false);
-            characterMovement.SetAimInput(new Vector2(lookDir.x, lookDir.z));
-            characterShooter.TryShoot();
-            targetTransform = null;
+        { 
+            SetState(States.Shoot); 
+            Vector3 lookDir = (targetTransform.position - transform.position).normalized; 
+            lookDir.y = 0; 
+            
+            // --- FIXED AI Lateral Strafing Logic --- 
+            aiStrafeTimer -= Time.deltaTime; 
+            
+            // ONLY pick a new target position when the timer runs out
+            if (aiStrafeTimer <= 0) 
+            {
+                aiStrafeDirection = Random.Range(0, 2) == 0 ? -1 : 1; 
+                aiStrafeTimer = Random.Range(1f, 3f); 
+
+                Vector3 rightDir = Vector3.Cross(Vector3.up, lookDir); 
+                
+                // Pick a static point in the world
+                Vector3 strafeTarget = transform.position + (rightDir * aiStrafeDirection * 4f); 
+                
+                // Optional but recommended: Sample the NavMesh to make sure the AI doesn't try to strafe into a wall
+                if (NavMesh.SamplePosition(strafeTarget, out NavMeshHit hit, 4f, NavMesh.AllAreas))
+                    movePosition = hit.position; 
+                else movePosition = transform.position; // Fallback so they don't break
+            } 
+            // ---------------------------------------
+
+            characterMovement.SetStopDistance(0f); // Allow them to keep sliding sideways 
+            characterMovement.SetCanRotate(false); 
+            characterMovement.SetAimInput(new Vector2(lookDir.x, lookDir.z)); 
+            characterShooter.TryShoot(); 
+            targetTransform = null; 
         }
     }
 

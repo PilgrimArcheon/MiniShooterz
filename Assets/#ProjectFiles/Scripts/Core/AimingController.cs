@@ -18,7 +18,7 @@ public class AimingController : MonoBehaviour
 
     [SerializeField] private GameObject aimIndicator;
     [SerializeField] private GameObject abilityAimIndicator;
-
+    private bool isAiming;
     private bool startedAiming;
     private bool isAbilityAim;
     private Vector3 aimInput;
@@ -52,7 +52,7 @@ public class AimingController : MonoBehaviour
     {
         if (!characterShooter.CanShoot) return;
 
-        bool isAiming = playerInputHandler.IsAimingInput;
+        isAiming = playerInputHandler.IsAimingInput;
         aimIndicator.SetActive(isAiming);
 
         if (isAiming) UpdateAim(false);   // Normal shoot
@@ -64,6 +64,7 @@ public class AimingController : MonoBehaviour
         ShootInDirection(aimFollow.position);
         startedAiming = false;
         playerInputHandler.ResetAbility();
+        isAiming = false;
     }
     #endregion
 
@@ -72,7 +73,7 @@ public class AimingController : MonoBehaviour
     {
         if (!characterShooter.CanUseAbility) return;
 
-        bool isAiming = playerInputHandler.IsAimingInput;
+        isAiming = playerInputHandler.IsAimingInput;
         abilityAimIndicator.SetActive(isAiming);
 
         if (isAiming)
@@ -90,6 +91,7 @@ public class AimingController : MonoBehaviour
         isAbilityAim = false;
         startedAiming = false;
         playerInputHandler.ResetAbility();
+        isAiming = false;
     }
     #endregion
 
@@ -146,8 +148,7 @@ public class AimingController : MonoBehaviour
 
         if (Physics.SphereCast(ray, radius, out RaycastHit hit, characterShooter.maxDistance, hitMask))
             endPoint = new Vector3(hit.point.x, origin.y, hit.point.z);
-        else
-            endPoint = aimFollow.position;
+        else endPoint = aimFollow.position;
 
         if (isAbility) UpdateAbilityVfx(endPoint);
         else UpdateWeaponVfx(origin, endPoint);
@@ -230,4 +231,6 @@ public class AimingController : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, autoAimRange);
     }
+
+    public bool IsAiming() => isAiming;
 }

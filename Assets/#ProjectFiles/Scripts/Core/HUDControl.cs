@@ -40,7 +40,11 @@ public class HUDControl : MonoBehaviour
         }
     }
 
-    private void OnStateChange(bool show) { hudUI.SetActive(show); Debug.Log("Health State Changed"); }
+    private void OnStateChange(bool show)
+    {
+        if (hudUI != null) hudUI.SetActive(show);
+        Debug.Log("Health State Changed");
+    }
 
     public void SetUpHUD(string userId, int _characterTeam)
     {
@@ -59,7 +63,7 @@ public class HUDControl : MonoBehaviour
         userName = hudTransform.GetChild(0).GetComponent<TMP_Text>();
         healthSlider = hudTransform.GetChild(1).GetComponent<Slider>();
         bulletCountHolder = hudTransform.GetChild(2).gameObject;
-        
+
         OnSwitchWeapons();
 
         foreach (Transform child in bulletCountHolder.transform) { bulletCountUi.Add(child.GetChild(0).GetComponent<Image>()); }

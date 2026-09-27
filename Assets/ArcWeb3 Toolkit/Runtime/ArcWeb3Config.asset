@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51346c72569625d46a27b1303cf52780, type: 3}
+  m_Name: ArcWeb3Config
+  m_EditorClassIdentifier: Assembly-CSharp:ArcWeb3:ArcWeb3Config
+  chainIdHex: 0x2B74
+  chainName: Abstract Testnet
+  currencyName: ETH
+  currencySymbol: ETH
+  currencyDecimals: 18
+  rpcUrl: https://api.testnet.abs.xyz
+  blockExplorerUrl: https://explorer.testnet.abs.xyz
+  contractAddress: 0xCf382519859bB8605F3Cf5Eb2406F8E9B3b605d6
+  contractABI: '[]'

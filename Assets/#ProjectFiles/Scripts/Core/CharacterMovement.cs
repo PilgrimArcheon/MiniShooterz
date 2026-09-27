@@ -25,19 +25,23 @@ public class CharacterMovement : MonoBehaviour
     public void SetCanRotate(bool canRotate) => CanRotate = canRotate;
     void Start()
     {
-        if (IsAI) agent = GetComponent<NavMeshAgent>();
+        if (IsAI)
+        {
+            agent = GetComponent<NavMeshAgent>();
+            agent.updateRotation = false;
+        }
         else controller = GetComponent<CharacterController>();
 
         yPos = transform.position.y;
     }
+
     private void Update()
     {
         if (!IsAI)
         {
             Move();
 
-            if (CanRotate)
-                Rotate(movementInput);
+            if (CanRotate) Rotate(movementInput);
             else Rotate(aimInput);
         }
         else AIMove();
@@ -49,18 +53,32 @@ public class CharacterMovement : MonoBehaviour
         Vector3 moveDirection = new Vector3(movementInput.x, 0, movementInput.y).normalized;
         controller.Move(moveSpeed * Time.deltaTime * moveDirection);
         transform.position = new Vector3(transform.position.x, yPos, transform.position.z);
-        //transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
+        // transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
     }
 
     private void AIMove()
     {
         agent.speed = moveSpeed;
-        agent.SetDestination(moveDestination);
         agent.stoppingDistance = stopDistance;
 
-        Vector3 smoothLookAt = Vector3.Slerp(currentLookAt, moveDestination, 10f * Time.deltaTime);
-        transform.LookAt(smoothLookAt);
-        currentLookAt = smoothLookAt;
+        // ONLY recalculate the path if the target destination has moved significantly
+        // This stops the NavMeshAgent from micro-stuttering every frame.
+        if (Vector3.Distance(agent.destination, moveDestination) > 0.5f)
+        {
+            agent.SetDestination(moveDestination);
+        }
+
+        // If CanRotate is true, look where we are going. If false, look at the aim input.
+        Vector3 lookTarget = CanRotate ? moveDestination : transform.position + new Vector3(aimInput.x, 0, aimInput.y);
+        
+        Vector3 targetDir = (lookTarget - transform.position).normalized;
+        targetDir.y = 0; // Keep it horizontal
+        
+        if (targetDir.magnitude > 0.1f)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(targetDir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime / 100f);
+        }
     }
 
     Vector3 currentLookAt;
@@ -75,6 +93,13 @@ public class CharacterMovement : MonoBehaviour
         Quaternion targetRotation = Quaternion.Euler(new Vector3(0, angle, 0));
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotSpeeed * Time.deltaTime);
     }
+
+    public Vector3 GetVelocity() 
+    {
+        if (IsAI && agent != null) return agent.velocity;
+        if (!IsAI && controller != null) return controller.velocity;
+        return Vector3.zero;
+    }
 }
 
 public enum States
@@ -82,5 +107,5 @@ public enum States
     Base,
     Shoot,
     Ability,
-    TakingDamage    
+    TakingDamage
 }

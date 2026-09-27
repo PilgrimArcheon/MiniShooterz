@@ -18,7 +18,7 @@ public class PlayerCharacterController : MonoBehaviour, ICombat, IStates
     private HUDControl hUDControl;
     private Animator animator;
     private Vector2 movementInput;
-    private AudioListener audioListener; 
+    private AudioListener audioListener;
 
     public string playerId;
 
@@ -112,7 +112,6 @@ public class PlayerCharacterController : MonoBehaviour, ICombat, IStates
         aimingController.oppLayer = LayerMask.GetMask(oppLayer); // Set player's Opp team
     }
 
-
     private void Update()
     {
         playerInputHandler.enabled = true;
@@ -125,6 +124,7 @@ public class PlayerCharacterController : MonoBehaviour, ICombat, IStates
         }
 
         HandleMovementInput();
+        HandleRotationState(); // <-- Added to control where the body looks while aiming
         HandleAnimations();
         audioListener.transform.position = transform.position;
     }
@@ -137,9 +137,45 @@ public class PlayerCharacterController : MonoBehaviour, ICombat, IStates
         characterMovement.SetMovementInput(movementInput);
     }
 
+    // --- NEW METHOD ---
+    private void HandleRotationState()
+    {
+        // If taking damage, let the animation handle it
+        if (currentState == States.TakingDamage) return;
+
+        bool isAiming = aimingController.IsAiming();
+
+        if (isAiming)
+        {
+            // We are aiming! Lock the body rotation away from the movement direction
+            characterMovement.SetCanRotate(false);
+
+            // Tell the character to specifically look at the aiming crosshair
+            Vector3 aimDir = (aimingController.aimFollow.position - transform.position).normalized;
+            characterMovement.SetAimInput(new Vector2(aimDir.x, aimDir.z));
+        }
+        else if (currentState == States.Base)
+        {
+            // We released aim and aren't shooting, go back to normal walk direction
+            characterMovement.SetCanRotate(true);
+        }
+    }
+
     private void HandleAnimations()
     {
+        bool hasTarget = aimingController.IsAiming();
+        animator.SetBool("hasTarget", hasTarget);
+
         animator.SetBool("move", movementInput.magnitude > 0f);
+        animator.SetFloat("movement", movementInput.magnitude > 0f ? 1f : 0f);
+
+        // Convert world input to local space relative to the character's rotation
+        Vector3 worldMoveDir = new Vector3(movementInput.x, 0f, movementInput.y);
+        Vector3 localMoveDir = transform.InverseTransformDirection(worldMoveDir);
+
+        // Pass the local X (left/right) and local Z (forward/back) to the animator
+        animator.SetFloat("moveX", hasTarget ? localMoveDir.x : 0f);
+        animator.SetFloat("moveY", hasTarget ? localMoveDir.z : 0f);
         animator.SetFloat("weaponId", characterShooter.currentWeaponId);
     }
 
@@ -234,7 +270,11 @@ public class PlayerCharacterController : MonoBehaviour, ICombat, IStates
     private IEnumerator SwitchStateDelay(States state, float waitTime)
     {
         yield return new WaitForSeconds(waitTime + 0.5f);
-        characterMovement.SetCanRotate(true);
+
+        // Let HandleRotationState manage CanRotate instead of doing it blindly here
+        if (!aimingController.IsAiming())
+            characterMovement.SetCanRotate(true);
+
         animator.SetLayerWeight(1, 0);
         SetState(state);
     }
